@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="th" class="dark">
 <head>
@@ -12,21 +11,20 @@
     <!-- Google Fonts - Kanit -->
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDK (Modular v10) -->
+    <!-- Firebase SDK (Modular v10) & Your Config -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // ==========================================
-        // 🔑 ใส่ข้อมูล Firebase Config ของคุณตรงนี้
-        // ==========================================
+        // Your web app's Firebase configuration
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY_HERE",
-            authDomain: "YOUR_AUTH_DOMAIN_HERE",
-            projectId: "YOUR_PROJECT_ID_HERE",
-            storageBucket: "YOUR_STORAGE_BUCKET_HERE",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID_HERE",
-            appId: "YOUR_APP_ID_HERE"
+            apiKey: "AIzaSyA0Ic62Ehe9yQ_rHZmYtFnWU11HgLCNStA",
+            authDomain: "mlbb-marketplace.firebaseapp.com",
+            projectId: "mlbb-marketplace",
+            storageBucket: "mlbb-marketplace.firebasestorage.app",
+            messagingSenderId: "232464081177",
+            appId: "1:232464081177:web:5c2fbdcaf6bffdabd0e588",
+            measurementId: "G-C2K72BN6NS"
         };
 
         // Initialize Firebase
@@ -677,4 +675,428 @@
         let accounts = [];
         let orders = [];
         let bankSettings = { bankName: 'กสิกรไทย', accountNo: '123-4-56789-0', accountName: 'ร้าน MLBB', promptpayNo: '0895959595', qrImageUrl: '' };
-        let adminAuth = { username: 'admin', password: 'ml
+        let adminAuth = { username: 'admin', password: 'mlbb1234' };
+        let isAdminLoggedIn = false;
+        let currentDetailImageIndex = 0;
+        let uploadedAccountFiles = [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const checkDbInterval = setInterval(() => {
+                if (window.db) {
+                    clearInterval(checkDbInterval);
+                    initFirebaseSync();
+                }
+            }, 200);
+        });
+
+        function initFirebaseSync() {
+            const { collection, onSnapshot } = window.FB_SDK;
+            const db = window.db;
+
+            onSnapshot(collection(db, "accounts"), (snapshot) => {
+                accounts = [];
+                snapshot.forEach((docSnap) => {
+                    accounts.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                refreshAllViews();
+            }, (error) => {
+                console.log("Using local fallback if offline:", error);
+            });
+
+            onSnapshot(collection(db, "orders"), (snapshot) => {
+                orders = [];
+                snapshot.forEach((docSnap) => {
+                    orders.push({ orderId: docSnap.id, ...docSnap.data() });
+                });
+                updateOrderBadge();
+                renderAdminOrders();
+                renderUserOrders();
+            });
+
+            onSnapshot(collection(db, "settings"), (snapshot) => {
+                snapshot.forEach((docSnap) => {
+                    if (docSnap.id === 'bank') bankSettings = docSnap.data();
+                });
+            });
+        }
+
+        async function refreshAllViews() {
+            renderHomeFeatured();
+            renderCatalog();
+            renderAdminInventory();
+            renderAdminOrders();
+            renderUserOrders();
+            updateAdminStats();
+        }
+
+        function navigateTo(viewName, param = null) {
+            if (viewName === 'admin' && !isAdminLoggedIn) {
+                document.getElementById('login-error-msg').classList.add('hidden');
+                document.getElementById('login-username').value = '';
+                document.getElementById('login-password').value = '';
+                document.getElementById('modal-admin-login').classList.remove('hidden');
+                return;
+            }
+
+            ['home', 'catalog', 'detail', 'orders', 'admin'].forEach(v => {
+                document.getElementById(`view-${v}`).classList.add('hidden');
+            });
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-300 hover:text-white hover:bg-slate-800/60";
+            });
+
+            const activeBtn = document.getElementById(`nav-${viewName}`);
+            if (activeBtn) {
+                activeBtn.className = viewName === 'admin' 
+                    ? "nav-btn px-4 py-2 rounded-xl text-sm font-medium text-amber-400 bg-amber-500/10 border border-amber-500/30 ml-2"
+                    : "nav-btn px-4 py-2 rounded-xl text-sm font-medium text-amber-400 bg-amber-950/40 border border-amber-500/30";
+            }
+
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (viewName === 'detail' && param) renderAccountDetail(param);
+            else if (viewName === 'catalog') renderCatalog();
+            else if (viewName === 'orders') renderUserOrders();
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        function handleAdminLoginSubmit(e) {
+            e.preventDefault();
+            if (document.getElementById('login-username').value.trim() === adminAuth.username && 
+                document.getElementById('login-password').value.trim() === adminAuth.password) {
+                isAdminLoggedIn = true;
+                closeModal('modal-admin-login');
+                showToast('เข้าสู่ระบบ Admin สำเร็จ');
+                navigateTo('admin');
+            } else {
+                document.getElementById('login-error-msg').classList.remove('hidden');
+            }
+        }
+
+        function handleAdminLogout() {
+            if (confirm('ออกจากระบบ Admin?')) {
+                isAdminLoggedIn = false;
+                navigateTo('home');
+                showToast('ออกจากระบบแล้ว');
+            }
+        }
+
+        function renderHomeFeatured() {
+            const grid = document.getElementById('home-featured-grid');
+            if (!grid) return;
+            const featured = accounts.slice(0, 6);
+            grid.innerHTML = featured.length === 0 ? `<div class="col-span-full text-center py-10 text-slate-500">ไม่มีรายการไอดีในระบบ Cloud</div>` : featured.map(acc => createAccountCardHTML(acc)).join('');
+        }
+
+        function renderCatalog() {
+            const grid = document.getElementById('catalog-grid');
+            if (!grid) return;
+            const searchVal = document.getElementById('filter-search')?.value.toLowerCase() || '';
+            const rankVal = document.getElementById('filter-rank')?.value || 'ALL';
+            const statusVal = document.getElementById('filter-status')?.value || 'ALL';
+
+            const filtered = accounts.filter(acc => {
+                const matchesSearch = acc.title.toLowerCase().includes(searchVal) || acc.id.toLowerCase().includes(searchVal);
+                const matchesRank = (rankVal === 'ALL') || (acc.rank && acc.rank.includes(rankVal));
+                const matchesStatus = (statusVal === 'ALL') || (acc.status === statusVal);
+                return matchesSearch && matchesRank && matchesStatus;
+            });
+
+            grid.innerHTML = filtered.length === 0 ? `<div class="col-span-full text-center py-16 text-slate-400">ไม่พบไอดีที่ค้นหา</div>` : filtered.map(acc => createAccountCardHTML(acc)).join('');
+        }
+
+        function applyFilters() { renderCatalog(); }
+
+        function createAccountCardHTML(acc) {
+            const mainImg = acc.images?.[0] || 'https://placehold.co/600x400/1e293b/a855f7?text=MLBB';
+            const isSold = acc.status === 'SOLD';
+            return `
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-amber-500/50 flex flex-col justify-between shadow-xl">
+                    <div>
+                        <div class="relative aspect-video overflow-hidden bg-slate-950">
+                            <img src="${mainImg}" class="w-full h-full object-cover ${isSold ? 'grayscale brightness-50' : ''}">
+                            <span class="absolute top-3 left-3 px-2.5 py-0.5 rounded text-xs font-black bg-slate-950/90 text-amber-400 border border-amber-500/40">MLBB เครื่องแต่ง</span>
+                            ${isSold ? `<div class="absolute inset-0 flex items-center justify-center bg-black/70"><span class="px-4 py-1.5 rounded-xl bg-red-600 text-white font-black text-sm uppercase">ขายแล้ว</span></div>` : ''}
+                        </div>
+                        <div class="p-5 space-y-3">
+                            <div class="flex justify-between text-xs text-slate-400"><span class="font-mono text-amber-400">${acc.id}</span><span>${acc.rank || ''}</span></div>
+                            <h3 class="font-bold text-white text-base line-clamp-2 cursor-pointer hover:text-amber-300" onclick="navigateTo('detail', '${acc.id}')">${acc.title}</h3>
+                        </div>
+                    </div>
+                    <div class="px-5 pb-5 pt-2 border-t border-slate-800/60 flex justify-between items-center">
+                        <span class="text-2xl font-black text-emerald-400">฿${Number(acc.price).toLocaleString()}</span>
+                        <button onclick="navigateTo('detail', '${acc.id}')" class="px-4 py-2 rounded-xl bg-amber-500/10 text-amber-300 hover:bg-amber-500 hover:text-slate-950 text-xs font-bold">ดูรายละเอียด</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAccountDetail(accId) {
+            const container = document.getElementById('detail-container');
+            const acc = accounts.find(a => a.id === accId);
+            if (!container || !acc) return;
+            const images = acc.images || ['https://placehold.co/800x500/1e293b/a855f7?text=MLBB'];
+            const isSold = acc.status === 'SOLD';
+
+            container.innerHTML = `
+                <div class="lg:col-span-7 space-y-4">
+                    <div class="relative rounded-2xl overflow-hidden bg-slate-950 aspect-video"><img id="detail-main-img" src="${images[0]}" class="w-full h-full object-contain bg-black/40"></div>
+                </div>
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+                        <h1 class="text-xl font-black text-white">${acc.title}</h1>
+                        <span class="text-3xl font-black text-emerald-400">฿${Number(acc.price).toLocaleString()}</span>
+                        <p class="text-xs text-slate-300">${acc.desc || ''}</p>
+                        ${isSold ? '<button disabled class="w-full py-3.5 rounded-xl bg-slate-800 text-slate-500 font-bold">ขายแล้ว</button>' : `<button onclick="openCheckoutModal('${acc.id}')" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-pink-600 text-white font-black">สั่งซื้อทันที</button>`}
+                    </div>
+                </div>
+            `;
+        }
+
+        function openCheckoutModal(accId) {
+            const acc = accounts.find(a => a.id === accId);
+            if (!acc) return;
+            document.getElementById('checkout-acc-id').value = acc.id;
+            document.querySelectorAll('.checkout-price-display').forEach(el => el.textContent = Number(acc.price).toLocaleString());
+            document.getElementById('display-bank-name').textContent = bankSettings.bankName;
+            document.getElementById('display-bank-acc-no').textContent = bankSettings.accountNo;
+            document.getElementById('display-bank-acc-name').textContent = bankSettings.accountName;
+            document.getElementById('display-promptpay-no').textContent = bankSettings.promptpayNo;
+            document.getElementById('checkout-qr-img').src = bankSettings.qrImageUrl || `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=PROMPTPAY-${bankSettings.promptpayNo}-AMOUNT-${acc.price}`;
+            document.getElementById('checkout-summary').innerHTML = `<img src="${acc.images[0]}" class="w-16 h-12 object-cover rounded-lg"><div><h4 class="font-bold text-white text-sm">${acc.title}</h4><p class="text-xs text-amber-400">${acc.id}</p></div>`;
+            document.getElementById('modal-checkout').classList.remove('hidden');
+        }
+
+        function switchPayTab(tab) {
+            document.getElementById('pay-panel-bank').classList.toggle('hidden', tab !== 'bank');
+            document.getElementById('pay-panel-promptpay').classList.toggle('hidden', tab !== 'promptpay');
+        }
+
+        function handleSlipFileUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    document.getElementById('checkout-slip-url').value = evt.target.result;
+                    document.getElementById('checkout-slip-preview-img').src = evt.target.result;
+                    document.getElementById('checkout-slip-preview-box').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function handleCheckoutSubmit(e) {
+            e.preventDefault();
+            const { doc, setDoc } = window.FB_SDK;
+            const orderId = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
+            const orderData = {
+                accId: document.getElementById('checkout-acc-id').value,
+                accTitle: accounts.find(a => a.id === document.getElementById('checkout-acc-id').value)?.title || '',
+                price: Number(document.querySelector('.checkout-price-display').textContent.replace(/,/g, '')),
+                contact: document.getElementById('checkout-contact').value,
+                slipUrl: document.getElementById('checkout-slip-url').value,
+                status: 'PENDING',
+                createdAt: new Date().toLocaleString('th-TH')
+            };
+            await setDoc(doc(window.db, "orders", orderId), orderData);
+            closeModal('modal-checkout');
+            showToast('ส่งสลิปเรียบร้อย รอแอดมินอนุมัติ');
+            navigateTo('orders');
+        }
+
+        function renderUserOrders() {
+            const container = document.getElementById('orders-list-container');
+            if (!container) return;
+            container.innerHTML = orders.length === 0 ? `<div class="text-center py-16 text-slate-400">ไม่มีประวัติคำสั่งซื้อ</div>` : orders.map(ord => {
+                const acc = accounts.find(a => a.id === ord.accId);
+                return `
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                        <div class="flex justify-between border-b border-slate-800 pb-3 text-xs"><span class="text-amber-400 font-bold">${ord.orderId}</span><span>${ord.status}</span></div>
+                        <h4 class="font-bold text-white">${ord.accTitle}</h4>
+                        ${ord.status === 'APPROVED' && acc ? `<div class="bg-purple-950/80 p-3 rounded-xl border border-purple-500 font-mono text-xs">ID: ${acc.loginId} | Pass: ${acc.loginPass}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function switchAdminTab(tab) {
+            ['inventory', 'bank', 'orders'].forEach(t => {
+                document.getElementById(`admin-sec-${t}`).classList.toggle('hidden', t !== tab);
+                document.getElementById(`admin-tab-${t}`).className = t === tab ? "pb-3 text-sm font-bold border-b-2 border-amber-400 text-amber-400" : "pb-3 text-sm font-bold border-b-2 border-transparent text-slate-400";
+            });
+        }
+
+        function updateAdminStats() {
+            document.getElementById('stat-total-accounts').textContent = accounts.length;
+            document.getElementById('stat-available-accounts').textContent = accounts.filter(a => a.status === 'AVAILABLE').length;
+            document.getElementById('stat-total-orders').textContent = orders.length;
+        }
+
+        function renderAdminInventory() {
+            const tbody = document.getElementById('admin-inventory-table');
+            if (!tbody) return;
+            tbody.innerHTML = accounts.map(acc => `
+                <tr class="hover:bg-slate-950/40">
+                    <td class="py-3 px-4"><img src="${acc.images?.[0]}" class="w-14 h-10 object-cover rounded"></td>
+                    <td class="py-3 px-4"><div class="font-bold text-white text-sm">${acc.title}</div><div class="text-xs text-amber-400">${acc.id}</div></td>
+                    <td class="py-3 px-4 text-emerald-400 font-bold">฿${Number(acc.price).toLocaleString()}</td>
+                    <td class="py-3 px-4 text-xs">${acc.images?.length || 0} รูป</td>
+                    <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-xs font-bold ${acc.status === 'SOLD' ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}">${acc.status}</span></td>
+                    <td class="py-3 px-4 text-center space-x-1">
+                        <button onclick="openQuickPriceModal('${acc.id}')" class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg text-xs"><i class="fa-solid fa-tags"></i></button>
+                        <button onclick="deleteAccount('${acc.id}')" class="p-2 bg-red-500/10 text-red-400 rounded-lg text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderAdminOrders() {
+            const tbody = document.getElementById('admin-orders-table');
+            if (!tbody) return;
+            tbody.innerHTML = orders.map(ord => `
+                <tr class="hover:bg-slate-950/40">
+                    <td class="py-3 px-4 font-mono text-xs text-amber-400">${ord.orderId}</td>
+                    <td class="py-3 px-4 text-xs">${ord.contact}</td>
+                    <td class="py-3 px-4 text-xs font-semibold text-white">${ord.accTitle}</td>
+                    <td class="py-3 px-4 text-emerald-400 text-xs font-bold">฿${Number(ord.price).toLocaleString()}</td>
+                    <td class="py-3 px-4"><button onclick="previewSlip('${ord.slipUrl}')" class="text-cyan-400 text-xs underline"><i class="fa-solid fa-image"></i> ดูสลิป</button></td>
+                    <td class="py-3 px-4 text-xs">${ord.status}</td>
+                    <td class="py-3 px-4 text-center">
+                        ${ord.status === 'PENDING' ? `<button onclick="updateOrderStatus('${ord.orderId}', 'APPROVED', '${ord.accId}')" class="px-2.5 py-1 bg-emerald-600 text-white rounded text-xs font-bold"><i class="fa-solid fa-check"></i> อนุมัติ</button>` : 'เสร็จสิ้น'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function handleAccountFilesUpload(e) {
+            uploadedAccountFiles = [];
+            Array.from(e.target.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    uploadedAccountFiles.push(evt.target.result);
+                    document.getElementById('acc-images-preview').innerHTML = uploadedAccountFiles.map(src => `<div class="w-16 h-16 rounded overflow-hidden border border-slate-700"><img src="${src}" class="w-full h-full object-cover"></div>`).join('');
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function openAddAccountModal() {
+            document.getElementById('form-account').reset();
+            document.getElementById('form-acc-id').value = '';
+            uploadedAccountFiles = [];
+            document.getElementById('acc-images-preview').innerHTML = '';
+            document.getElementById('modal-account').classList.remove('hidden');
+        }
+
+        async function handleAccountFormSubmit(e) {
+            e.preventDefault();
+            const { doc, setDoc } = window.FB_SDK;
+            const accId = document.getElementById('form-acc-id').value || ('MLBB-' + Math.floor(5900 + Math.random() * 1000));
+            const accData = {
+                title: document.getElementById('form-acc-title').value,
+                tag: document.getElementById('form-acc-tag').value,
+                rank: document.getElementById('form-acc-rank').value,
+                price: Number(document.getElementById('form-acc-price').value),
+                oldPrice: Number(document.getElementById('form-acc-oldprice').value) || null,
+                skins: document.getElementById('form-acc-skins').value,
+                heroes: document.getElementById('form-acc-heroes').value,
+                desc: document.getElementById('form-acc-desc').value,
+                loginId: document.getElementById('form-acc-login-id').value,
+                loginPass: document.getElementById('form-acc-login-pass').value,
+                status: document.getElementById('form-acc-status').value,
+                images: uploadedAccountFiles.length > 0 ? uploadedAccountFiles : ['https://placehold.co/800x500/1e293b/a855f7?text=MLBB']
+            };
+            await setDoc(doc(window.db, "accounts", accId), accData);
+            closeModal('modal-account');
+            showToast('บันทึกไอดีขึ้น Cloud สำเร็จ!');
+        }
+
+        async function deleteAccount(accId) {
+            if (confirm('ต้องการลบไอดีนี้ออกจาก Cloud?')) {
+                const { doc, deleteDoc } = window.FB_SDK;
+                await deleteDoc(doc(window.db, "accounts", accId));
+                showToast('ลบไอดีสำเร็จ');
+            }
+        }
+
+        function openQuickPriceModal(accId) {
+            const acc = accounts.find(a => a.id === accId);
+            if (!acc) return;
+            document.getElementById('qp-acc-id').value = acc.id;
+            document.getElementById('qp-acc-title').textContent = acc.title;
+            document.getElementById('qp-acc-price').value = acc.price;
+            document.getElementById('modal-quick-price').classList.remove('hidden');
+        }
+
+        async function handleQuickPriceSubmit(e) {
+            e.preventDefault();
+            const { doc, updateDoc } = window.FB_SDK;
+            const accId = document.getElementById('qp-acc-id').value;
+            const newPrice = Number(document.getElementById('qp-acc-price').value);
+            await updateDoc(doc(window.db, "accounts", accId), { price: newPrice });
+            closeModal('modal-quick-price');
+            showToast('อัปเดตราคาสำเร็จ');
+        }
+
+        async function updateOrderStatus(orderId, status, accId) {
+            const { doc, updateDoc } = window.FB_SDK;
+            await updateDoc(doc(window.db, "orders", orderId), { status });
+            if (status === 'APPROVED') {
+                await updateDoc(doc(window.db, "accounts", accId), { status: 'SOLD' });
+            }
+            showToast('อัปเดตสถานะสำเร็จ');
+        }
+
+        async function handleBankSettingsSubmit(e) {
+            e.preventDefault();
+            const { doc, setDoc } = window.FB_SDK;
+            const bankData = {
+                bankName: document.getElementById('admin-bank-name').value,
+                accountNo: document.getElementById('admin-bank-acc-no').value,
+                accountName: document.getElementById('admin-bank-acc-name').value,
+                promptpayNo: document.getElementById('admin-promptpay-no').value,
+                qrImageUrl: document.getElementById('admin-qr-url').value
+            };
+            await setDoc(doc(window.db, "settings", "bank"), bankData);
+            showToast('บันทึกข้อมูลธนาคารขึ้น Cloud แล้ว');
+        }
+
+        function handleAdminQRFileUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    document.getElementById('admin-qr-url').value = evt.target.result;
+                    document.getElementById('admin-qr-preview-img').src = evt.target.result;
+                    document.getElementById('admin-qr-preview-box').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function previewSlip(url) {
+            document.getElementById('slip-preview-img').src = url;
+            document.getElementById('modal-slip-preview').classList.remove('hidden');
+        }
+
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function updateOrderBadge() {
+            const badge = document.getElementById('order-badge');
+            if (badge) {
+                badge.textContent = orders.length;
+                badge.classList.toggle('hidden', orders.length === 0);
+            }
+        }
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+    </script>
+</body>
+</html>
