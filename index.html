@@ -1,15 +1,42 @@
+
 <!DOCTYPE html>
 <html lang="th" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MLBB เครื่องแต่ง - ตลาดซื้อขายไอดีเกม & สกิน MLBB</title>
+    <title>MLBB เครื่องแต่ง - ตลาดซื้อขายไอดีเกม & สกิน MLBB (Online Cloud)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts - Kanit -->
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDK (Modular v10) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // ==========================================
+        // 🔑 ใส่ข้อมูล Firebase Config ของคุณตรงนี้
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY_HERE",
+            authDomain: "YOUR_AUTH_DOMAIN_HERE",
+            projectId: "YOUR_PROJECT_ID_HERE",
+            storageBucket: "YOUR_STORAGE_BUCKET_HERE",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID_HERE",
+            appId: "YOUR_APP_ID_HERE"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Export to global scope for the app logic
+        window.db = db;
+        window.FB_SDK = { collection, getDocs, doc, setDoc, deleteDoc, updateDoc, onSnapshot };
+    </script>
 
     <script>
         tailwind.config = {
@@ -63,8 +90,8 @@
     <div class="bg-gradient-to-r from-purple-950 via-slate-900 to-amber-950 text-xs text-amber-200 py-1.5 px-4 border-b border-amber-500/30">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-2 truncate">
-                <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-extrabold text-[10px] uppercase border border-amber-500/40">OFFICIAL</span>
-                <span class="truncate"><i class="fa-solid fa-vest-patches text-amber-400 mr-1 animate-pulse"></i> ยินดีต้อนรับสู่ <strong>MLBB เครื่องแต่ง</strong> • ศูนย์รวมไอดีสกินแรร์ Collector, Legend, Prime & Mythic Glory</span>
+                <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-extrabold text-[10px] uppercase border border-amber-500/40">ONLINE CLOUD</span>
+                <span class="truncate"><i class="fa-solid fa-vest-patches text-amber-400 mr-1 animate-pulse"></i> ยินดีต้อนรับสู่ <strong>MLBB เครื่องแต่ง</strong> • ระบบฐานข้อมูลออนไลน์เรียลไทม์</span>
             </div>
             <div class="hidden sm:flex items-center gap-4 text-[11px] text-slate-400">
                 <span><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> ปลอดภัย 100% ประกันไอดีตลอดชีพ</span>
@@ -78,7 +105,6 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 
-                <!-- Brand Logo -->
                 <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('home')">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-purple-600 to-cyan-400 p-[2px] shadow-lg shadow-purple-500/20">
                         <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
@@ -93,7 +119,6 @@
                     </div>
                 </div>
 
-                <!-- Desktop Navigation Links -->
                 <nav class="hidden md:flex items-center space-x-1">
                     <button onclick="navigateTo('home')" id="nav-home" class="nav-btn px-4 py-2 rounded-xl text-sm font-medium transition-all text-amber-400 bg-amber-950/40 border border-amber-500/30">
                         <i class="fa-solid fa-house mr-1.5"></i> หน้าแรก
@@ -110,7 +135,6 @@
                     </button>
                 </nav>
 
-                <!-- Mobile Menu Button -->
                 <div class="md:hidden flex items-center">
                     <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="text-slate-300 hover:text-white p-2 rounded-lg">
                         <i class="fa-solid fa-bars text-xl"></i>
@@ -119,7 +143,6 @@
             </div>
         </div>
 
-        <!-- Mobile Drawer -->
         <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-b border-slate-800 px-4 pt-2 pb-4 space-y-2">
             <button onclick="navigateTo('home'); toggleMobileMenu()" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800 flex items-center">
                 <i class="fa-solid fa-house w-6 text-amber-400"></i> หน้าแรก
@@ -141,20 +164,19 @@
 
         <!-- ================= PAGE 1: HOME PAGE ================= -->
         <section id="view-home" class="space-y-8">
-            <!-- Hero Banner -->
             <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-950 via-purple-950 to-slate-950 border border-amber-500/30 p-8 sm:p-12 shadow-2xl">
                 <div class="absolute -right-10 -bottom-10 w-80 h-80 bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
                 <div class="absolute -left-10 -top-10 w-80 h-80 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
 
                 <div class="relative z-10 max-w-2xl space-y-4">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30">
-                        <i class="fa-solid fa-gem text-amber-400"></i> MLBB เครื่องแต่ง • MARKETPLACE
+                        <i class="fa-solid fa-gem text-amber-400"></i> MLBB เครื่องแต่ง • CLOUD MARKETPLACE
                     </span>
                     <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
                         ซื้อไอดีเกม <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-purple-300 to-pink-400">MLBB เครื่องแต่ง</span> สกินสะสมแรร์
                     </h1>
                     <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
-                        แหล่งรวมไอดี Mobile Legends: Bang Bang สกิน Collector, Legend, Prime, Sanrio, Aspirants และ KOF ตรวจสอบรูปภาพหลายมุมมองแบบจุใจ อัปโหลดรูปจากมือถือได้ทันที โอนไว รับรหัสผ่านเข้าเล่น!
+                        ระบบออนไลน์เรียลไทม์ 100% ลูกค้าทั่วโลกสามารถเข้าชมและกดสั่งซื้อสินค้าที่คุณโพสต์อัปเดตได้ทันที โอนไว รับรหัสผ่านเข้าเล่นอัตโนมัติ!
                     </p>
                     <div class="flex flex-wrap gap-4 pt-2">
                         <button onclick="navigateTo('catalog')" class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-purple-600 to-pink-600 text-white font-bold hover:brightness-110 shadow-lg shadow-purple-600/30 transition-all flex items-center gap-2">
@@ -167,25 +189,22 @@
                 </div>
             </div>
 
-            <!-- Featured Header -->
             <div class="flex items-center justify-between pt-2">
                 <div>
                     <h2 class="text-2xl font-black text-white flex items-center gap-2">
                         <i class="fa-solid fa-fire text-amber-500"></i> เครื่องแต่ง & ไอดี MLBB แนะนำ
                     </h2>
-                    <p class="text-xs text-slate-400">สกินสวย ไอดีสะอาด มีประกันเปลี่ยนรหัสผ่านได้ 100%</p>
+                    <p class="text-xs text-slate-400">สกินสวย ไอดีสะอาด ซิงค์ข้อมูลสดจาก Cloud Database</p>
                 </div>
                 <button onclick="navigateTo('catalog')" class="text-sm text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1">
                     ดูคลังทั้งหมด <i class="fa-solid fa-chevron-right text-xs"></i>
                 </button>
             </div>
 
-            <!-- Featured Grid -->
             <div id="home-featured-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Injected via JS -->
             </div>
         </section>
-
 
         <!-- ================= PAGE 2: CATALOG PAGE ================= -->
         <section id="view-catalog" class="hidden space-y-6">
@@ -194,10 +213,9 @@
                     <h2 class="text-2xl font-black text-white flex items-center gap-2">
                         <i class="fa-solid fa-shirt text-purple-400"></i> คลังไอดี MLBB เครื่องแต่ง
                     </h2>
-                    <p class="text-xs text-slate-400">กรองและค้นหาไอดีตามจำนวนสกิน แร้งค์ หรือสเกลราคาได้ทันที</p>
+                    <p class="text-xs text-slate-400">สินค้าอัปเดตสดใหม่จากหลังบ้านแอดมิน พร้อมให้ลูกค้าทุกท่านเลือกชม</p>
                 </div>
 
-                <!-- Filters & Search Bar -->
                 <div class="flex flex-wrap items-center gap-3">
                     <div class="relative flex-grow md:w-64">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
@@ -225,7 +243,6 @@
             </div>
         </section>
 
-
         <!-- ================= PAGE 3: ACCOUNT DETAIL PAGE ================= -->
         <section id="view-detail" class="hidden space-y-6">
             <button onclick="navigateTo('catalog')" class="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-all font-semibold">
@@ -237,7 +254,6 @@
             </div>
         </section>
 
-
         <!-- ================= PAGE 4: ORDER HISTORY PAGE ================= -->
         <section id="view-orders" class="hidden space-y-6">
             <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -245,7 +261,7 @@
                     <h2 class="text-2xl font-black text-white flex items-center gap-2">
                         <i class="fa-solid fa-receipt text-pink-400"></i> ประวัติคำสั่งซื้อ & รหัสผ่านเข้าเล่น
                     </h2>
-                    <p class="text-xs text-slate-400">เมื่อแอดมินอนุมัติสลิปโอนเงินแล้ว ข้อมูล ID/Password จะแสดงที่นี่ทันที</p>
+                    <p class="text-xs text-slate-400">เมื่อแอดมินอนุมัติสลิปโอนเงินผ่านระบบ Cloud แล้ว ข้อมูล ID/Password จะแสดงที่นี่ทันที</p>
                 </div>
             </div>
 
@@ -254,14 +270,13 @@
             </div>
         </section>
 
-
         <!-- ================= PAGE 5: ADMIN MANAGEMENT PANEL (PROTECTED) ================= -->
         <section id="view-admin" class="hidden space-y-6">
             <div class="bg-slate-900 p-6 rounded-2xl border border-amber-500/40 flex flex-wrap items-center justify-between gap-4">
                 <div>
-                    <span class="px-2.5 py-1 rounded-md text-xs font-black bg-amber-500/20 text-amber-400 border border-amber-500/40">ADMIN CONTROL PANEL</span>
-                    <h2 class="text-2xl font-black text-white mt-1">ระบบหลังบ้านจัดการไอดี (ส่วนตัว)</h2>
-                    <p class="text-xs text-slate-400">โพสต์ขายไอดี MLBB, ปรับราคาขาย, อัปเดตธนาคาร และตรวจสอบสลิปโอนเงิน</p>
+                    <span class="px-2.5 py-1 rounded-md text-xs font-black bg-amber-500/20 text-amber-400 border border-amber-500/40">ADMIN CLOUD CONTROL</span>
+                    <h2 class="text-2xl font-black text-white mt-1">ระบบหลังบ้านจัดการไอดี (ออนไลน์)</h2>
+                    <p class="text-xs text-slate-400">โพสต์ขายไอดีที่จะแสดงผลให้คนทั่วโลกเห็นทันที, ปรับราคา และตรวจสอบสลิป</p>
                 </div>
 
                 <div class="flex items-center gap-3">
@@ -274,11 +289,10 @@
                 </div>
             </div>
 
-            <!-- Stats Bar -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between">
                     <div>
-                        <p class="text-xs text-slate-400">จำนวนไอดีในระบบ</p>
+                        <p class="text-xs text-slate-400">จำนวนไอดีในระบบ Cloud</p>
                         <h3 id="stat-total-accounts" class="text-2xl font-bold text-white">0</h3>
                     </div>
                     <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400">
@@ -305,7 +319,6 @@
                 </div>
             </div>
 
-            <!-- Tabs Navigation -->
             <div class="flex border-b border-slate-800 space-x-4">
                 <button onclick="switchAdminTab('inventory')" id="admin-tab-inventory" class="pb-3 text-sm font-bold border-b-2 border-amber-400 text-amber-400">
                     <i class="fa-solid fa-list-check mr-1"></i> จัดการคลังไอดี & ปรับราคา
@@ -316,12 +329,8 @@
                 <button onclick="switchAdminTab('orders')" id="admin-tab-orders" class="pb-3 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200">
                     <i class="fa-solid fa-money-bill-wave mr-1"></i> ตรวจสอบสลิป & อนุมัติรหัส
                 </button>
-                <button onclick="switchAdminTab('settings')" id="admin-tab-settings" class="pb-3 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200">
-                    <i class="fa-solid fa-shield-halved mr-1"></i> เปลี่ยนรหัสผ่านแอดมิน
-                </button>
             </div>
 
-            <!-- Admin Inventory View -->
             <div id="admin-sec-inventory" class="space-y-4">
                 <div class="overflow-x-auto bg-slate-900 border border-slate-800 rounded-2xl">
                     <table class="w-full text-left text-sm text-slate-300">
@@ -342,11 +351,10 @@
                 </div>
             </div>
 
-            <!-- ADMIN BANK & QR SETTINGS VIEW -->
             <div id="admin-sec-bank" class="hidden space-y-4">
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-2xl space-y-4">
                     <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-building-columns text-emerald-400"></i> ตั้งค่าข้อมูลบัญชีธนาคาร & QR ของร้าน
+                        <i class="fa-solid fa-building-columns text-emerald-400"></i> ตั้งค่าข้อมูลบัญชีธนาคาร & QR ของร้าน (ซิงค์ Cloud)
                     </h3>
 
                     <form onsubmit="handleBankSettingsSubmit(event)" class="space-y-4">
@@ -390,14 +398,13 @@
 
                         <div class="pt-2">
                             <button type="submit" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/30">
-                                <i class="fa-solid fa-floppy-disk mr-1"></i> บันทึกข้อมูลบัญชีธนาคาร
+                                <i class="fa-solid fa-floppy-disk mr-1"></i> บันทึกข้อมูลขึ้น Cloud Database
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Admin Orders View -->
             <div id="admin-sec-orders" class="hidden space-y-4">
                 <div class="overflow-x-auto bg-slate-900 border border-slate-800 rounded-2xl">
                     <table class="w-full text-left text-sm text-slate-300">
@@ -418,32 +425,6 @@
                     </table>
                 </div>
             </div>
-
-            <!-- ADMIN PASSWORD CHANGE SETTINGS -->
-            <div id="admin-sec-settings" class="hidden space-y-4">
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md space-y-4">
-                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-key text-amber-400"></i> เปลี่ยนรหัสผ่านแอดมิน
-                    </h3>
-                    <form onsubmit="handleAdminPasswordChange(event)" class="space-y-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">Username ปัจจุบัน</label>
-                            <input type="text" id="change-pass-username" required 
-                                   class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500 font-mono">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">รหัสผ่านใหม่</label>
-                            <input type="password" id="change-pass-new" required placeholder="กรอกรหัสผ่านใหม่" 
-                                   class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500 font-mono">
-                        </div>
-                        <div class="pt-2">
-                            <button type="submit" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm shadow-lg">
-                                อัปเดตรหัสผ่านใหม่
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
         </section>
 
     </main>
@@ -458,7 +439,7 @@
                 <span class="font-extrabold text-slate-200 tracking-wide">MLBB เครื่องแต่ง</span>
             </div>
             <p class="text-xs text-slate-500 max-w-md mx-auto">
-                ศูนย์รวมไอดีและสกิน Mobile Legends: Bang Bang ปลอดภัย สะอาด ประกันเต็มราคา ระบบอัปโหลดรูปสะดวก 100%
+                ศูนย์รวมไอดีและสกิน Mobile Legends: Bang Bang ปลอดภัย สะอาด เชื่อมต่อฐานข้อมูล Cloud แบบเรียลไทม์
             </p>
             <div class="text-xs text-slate-600 pt-2">
                 © 2026 MLBB เครื่องแต่ง Store. All Rights Reserved.
@@ -466,10 +447,7 @@
         </div>
     </footer>
 
-
-    <!-- ================= MODALS ================= -->
-
-    <!-- ADMIN LOGIN MODAL -->
+    <!-- MODALS -->
     <div id="modal-admin-login" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-amber-500/40 rounded-2xl max-w-md w-full p-6 space-y-5 relative shadow-2xl">
             <button onclick="closeModal('modal-admin-login')" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2">
@@ -481,18 +459,18 @@
                     <i class="fa-solid fa-lock"></i>
                 </div>
                 <h3 class="text-xl font-black text-white">เข้าสู่ระบบ Admin ส่วนตัว</h3>
-                <p class="text-xs text-slate-400">เฉพาะเจ้าของเว็บไซต์เท่านั้นที่สามารถเข้าถึงระบบนี้ได้</p>
+                <p class="text-xs text-slate-400">จัดการร้านค้าและโพสต์ไอดีขึ้น Cloud</p>
             </div>
 
             <form onsubmit="handleAdminLoginSubmit(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Username (ชื่อผู้ใช้)</label>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Username</label>
                     <input type="text" id="login-username" required placeholder="admin" 
                            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500 font-mono">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Password (รหัสผ่าน)</label>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
                     <input type="password" id="login-password" required placeholder="••••••••" 
                            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500 font-mono">
                 </div>
@@ -507,14 +485,12 @@
                     </button>
                 </div>
             </form>
-
             <div class="text-center pt-2 border-t border-slate-800">
-                <p class="text-[11px] text-slate-500">รหัสผ่านเริ่มต้น: <code class="text-amber-400">admin</code> / <code class="text-amber-400">mlbb1234</code></p>
+                <p class="text-[11px] text-slate-500">ค่าเริ่มต้น: <code class="text-amber-400">admin</code> / <code class="text-amber-400">mlbb1234</code></p>
             </div>
         </div>
     </div>
 
-    <!-- 1. ADD / EDIT ACCOUNT MODAL (ADMIN) -->
     <div id="modal-account" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-4 my-8 relative max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl">
             <button onclick="closeModal('modal-account')" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2">
@@ -531,1361 +507,174 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-300 mb-1">แท็กเครื่องแต่ง/สกินไฮไลต์ *</label>
-                        <input type="text" id="form-acc-tag" required placeholder="เช่น Collector Gusion, Prime Beatrix" 
+                        <input type="text" id="form-acc-tag" required placeholder="เช่น Collector Gusion" 
                                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
                     </div>
-
                     <div>
                         <label class="block text-xs font-semibold text-slate-300 mb-1">แร้งค์ (Rank) *</label>
-                        <input type="text" id="form-acc-rank" required placeholder="เช่น Mythical Immortal (120 Stars)" 
+                        <input type="text" id="form-acc-rank" required placeholder="เช่น Mythical Immortal" 
                                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 mb-1">ชื่อไอดี / หัวข้อสินค้า *</label>
-                    <input type="text" id="form-acc-title" required placeholder="เช่น [MLBB] เครื่องแต่งตึงๆ สกิน Collector 5 ตัว + Legend Franco" 
+                    <input type="text" id="form-acc-title" required placeholder="เช่น [MLBB] เครื่องแต่งตึงๆ" 
                            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-300 mb-1">ราคาขายปัจจุบัน (บาท) *</label>
-                        <input type="number" id="form-acc-price" required min="1" placeholder="เช่น 1590" 
-                               class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500 font-bold text-emerald-400">
+                        <input type="number" id="form-acc-price" required min="1" placeholder="1590" 
+                               class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 font-bold text-emerald-400 focus:outline-none focus:border-amber-500">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-300 mb-1">ราคาเดิมก่อนลด (บาท)</label>
-                        <input type="number" id="form-acc-oldprice" min="0" placeholder="เช่น 2190" 
+                        <input type="number" id="form-acc-oldprice" min="0" placeholder="2190" 
                                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">จำนวนสกิน / เครื่องแต่ง *</label>
-                        <input type="text" id="form-acc-skins" required placeholder="เช่น 210 Skins" 
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">จำนวนสกิน *</label>
+                        <input type="text" id="form-acc-skins" required placeholder="210 Skins" 
                                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-300 mb-1">จำนวนฮีโร่ *</label>
-                        <input type="text" id="form-acc-heroes" required placeholder="เช่น 122 Heroes (ครบทุกตัว)" 
+                        <input type="text" id="form-acc-heroes" required placeholder="122 Heroes" 
                                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
                     </div>
                 </div>
 
-                <!-- DIRECT PHONE UPLOAD FOR PRODUCT IMAGES -->
                 <div class="space-y-2">
                     <label class="block text-xs font-semibold text-amber-400">
-                        <i class="fa-solid fa-mobile-screen-button mr-1"></i> อัปโหลดรูปภาพสินค้าจากโทรศัพท์มือถือ (เลือกได้หลายรูป) *
+                        <i class="fa-solid fa-mobile-screen-button mr-1"></i> อัปโหลดรูปภาพสินค้าจากโทรศัพท์มือถือ *
                     </label>
                     <input type="file" id="form-acc-file-input" accept="image/*" multiple onchange="handleAccountFilesUpload(event)"
-                           class="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-400 bg-slate-950 border border-slate-700 rounded-xl p-1 cursor-pointer">
-                    
-                    <!-- Images Thumbnail Preview Box -->
-                    <div id="acc-images-preview" class="flex flex-wrap gap-2 pt-2">
-                        <!-- Preview Images JS -->
-                    </div>
-
-                    <div class="pt-2">
-                        <label class="block text-[11px] text-slate-400 mb-1">หรือวาง URL ลิงก์รูปภาพเพิ่มเติม (แยกบรรทัดละ 1 ลิงก์):</label>
-                        <textarea id="form-acc-images" rows="2" placeholder="https://example.com/image1.jpg" 
-                                  class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500 custom-scrollbar font-mono"></textarea>
-                    </div>
+                           class="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-500 file:text-slate-950 cursor-pointer bg-slate-950 border border-slate-700 rounded-xl p-1">
+                    <div id="acc-images-preview" class="flex flex-wrap gap-2 pt-2"></div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 mb-1">รายละเอียดเครื่องแต่ง & การผูกบัญชี</label>
-                    <textarea id="form-acc-desc" rows="3" placeholder="ระบุเพิ่มเติม เช่น Moonton Clean เปลี่ยนอีเมลได้ทันที..." 
-                              class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-amber-500 custom-scrollbar"></textarea>
+                    <textarea id="form-acc-desc" rows="3" placeholder="Moonton Clean..." 
+                              class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-amber-500"></textarea>
                 </div>
 
-                <!-- Credential Box -->
                 <div class="bg-purple-950/40 border border-purple-500/40 p-4 rounded-xl space-y-3">
                     <h4 class="text-xs font-bold text-purple-300 flex items-center gap-1.5">
                         <i class="fa-solid fa-key text-amber-400"></i> ข้อมูลเข้าเล่น (ส่งให้ลูกค้าอัตโนมัติเมื่ออนุมัติสลิป)
                     </h4>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-[11px] text-slate-300 mb-1">ID / Email เข้าเล่น</label>
-                            <input type="text" id="form-acc-login-id" placeholder="mlbb_outfit_user@gmail.com" 
-                                   class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none">
+                            <input type="text" id="form-acc-login-id" placeholder="Email / ID" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200">
                         </div>
                         <div>
-                            <label class="block text-[11px] text-slate-300 mb-1">Password เข้าเล่น</label>
-                            <input type="text" id="form-acc-login-pass" placeholder="PassMlbb2026!" 
-                                   class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none">
+                            <input type="text" id="form-acc-login-pass" placeholder="Password" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200">
                         </div>
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 mb-1">สถานะสินค้า</label>
-                    <select id="form-acc-status" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                    <select id="form-acc-status" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200">
                         <option value="AVAILABLE">พร้อมขาย (Available)</option>
                         <option value="SOLD">ขายแล้ว (Sold Out)</option>
                     </select>
                 </div>
 
                 <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
-                    <button type="button" onclick="closeModal('modal-account')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm">
-                        ยกเลิก
-                    </button>
-                    <button type="submit" class="px-6 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-purple-600 hover:brightness-110 text-white font-bold text-sm shadow-lg shadow-purple-600/30">
-                        บันทึกข้อมูลไอดี
-                    </button>
+                    <button type="button" onclick="closeModal('modal-account')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-sm">ยกเลิก</button>
+                    <button type="submit" class="px-6 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-purple-600 text-white font-bold text-sm">บันทึกขึ้น Cloud</button>
                 </div>
             </form>
         </div>
     </div>
 
-
-    <!-- 2. QUICK PRICE EDIT MODAL (ADMIN) -->
     <div id="modal-quick-price" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
-            <button onclick="closeModal('modal-quick-price')" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                <i class="fa-solid fa-tags text-emerald-400"></i> ปรับเปลี่ยนราคาขาย MLBB
-            </h3>
+            <button onclick="closeModal('modal-quick-price')" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-tags text-emerald-400"></i> ปรับเปลี่ยนราคาขาย</h3>
             <form onsubmit="handleQuickPriceSubmit(event)" class="space-y-4">
                 <input type="hidden" id="qp-acc-id">
+                <p id="qp-acc-title" class="text-sm font-semibold text-purple-300 truncate"></p>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">ชื่อไอดี:</label>
-                    <p id="qp-acc-title" class="text-sm font-semibold text-purple-300 truncate"></p>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">ราคาใหม่ *</label>
+                    <input type="number" id="qp-acc-price" required min="1" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-lg font-bold text-emerald-400">
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">ราคาขายใหม่ (บาท) *</label>
-                    <input type="number" id="qp-acc-price" required min="1" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-lg font-bold text-emerald-400 focus:outline-none focus:border-amber-500">
-                </div>
-                <div class="flex justify-end gap-2 pt-2">
+                <div class="flex justify-end gap-2">
                     <button type="button" onclick="closeModal('modal-quick-price')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-sm">ยกเลิก</button>
-                    <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm">อัปเดตราคา</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 text-white font-bold text-sm">อัปเดต</button>
                 </div>
             </form>
         </div>
     </div>
 
-
-    <!-- 3. BUY / CHECKOUT MODAL (UPLOAD SLIP FROM PHONE) -->
     <div id="modal-checkout" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-5 relative my-8 shadow-2xl">
-            <button onclick="closeModal('modal-checkout')" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
+            <button onclick="closeModal('modal-checkout')" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-xl font-black text-white">ชำระเงิน</h3>
+            <div id="checkout-summary" class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex items-center gap-4"></div>
 
-            <div class="border-b border-slate-800 pb-3">
-                <span class="text-xs text-amber-400 font-bold tracking-wide">CHECKOUT • MLBB เครื่องแต่ง</span>
-                <h3 class="text-xl font-black text-white">ช่องทางการชำระเงิน</h3>
-            </div>
-
-            <!-- Item Summary -->
-            <div id="checkout-summary" class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex items-center gap-4">
-                <!-- Dynamic Summary -->
-            </div>
-
-            <!-- PAYMENT TABS -->
             <div class="flex border-b border-slate-800">
-                <button type="button" onclick="switchPayTab('bank')" id="pay-tab-bank" class="w-1/2 pb-2 text-sm font-bold border-b-2 border-emerald-400 text-emerald-400 text-center">
-                    <i class="fa-solid fa-building-columns mr-1"></i> โอนผ่านบัญชีธนาคาร
-                </button>
-                <button type="button" onclick="switchPayTab('promptpay')" id="pay-tab-promptpay" class="w-1/2 pb-2 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 text-center">
-                    <i class="fa-solid fa-qrcode mr-1"></i> PromptPay / QR Code
-                </button>
+                <button type="button" onclick="switchPayTab('bank')" id="pay-tab-bank" class="w-1/2 pb-2 text-sm font-bold border-b-2 border-emerald-400 text-emerald-400 text-center">โอนผ่านธนาคาร</button>
+                <button type="button" onclick="switchPayTab('promptpay')" id="pay-tab-promptpay" class="w-1/2 pb-2 text-sm font-bold border-b-2 border-transparent text-slate-400 text-center">PromptPay QR</button>
             </div>
 
             <form onsubmit="handleCheckoutSubmit(event)" class="space-y-4">
                 <input type="hidden" id="checkout-acc-id">
-
-                <!-- 1. BANK ACCOUNT PANEL -->
-                <div id="pay-panel-bank" class="bg-slate-950 border border-emerald-500/30 rounded-2xl p-4 space-y-3">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold">
-                        <i class="fa-solid fa-building-columns"></i> บัญชีธนาคารรับโอนเงิน
-                    </div>
-
-                    <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
-                        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                            <span class="text-slate-400">ธนาคาร:</span>
-                            <span id="display-bank-name" class="text-white font-bold flex items-center gap-1">
-                                <i class="fa-solid fa-money-check-dollar text-emerald-400"></i> -
-                            </span>
-                        </div>
-                        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                            <span class="text-slate-400">เลขที่บัญชี:</span>
-                            <div class="flex items-center gap-2">
-                                <span id="display-bank-acc-no" class="text-amber-400 font-mono font-bold text-base">-</span>
-                                <button type="button" onclick="copyCurrentBankAccNo()" class="text-xs bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/40">
-                                    <i class="fa-solid fa-copy"></i> คัดลอก
-                                </button>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-slate-400">ชื่อบัญชี:</span>
-                            <span id="display-bank-acc-name" class="text-white font-semibold">-</span>
-                        </div>
-                    </div>
-
-                    <div class="text-center text-emerald-400 font-black text-base pt-1">
-                        ยอดที่ต้องโอน: <span class="checkout-price-display">0</span> บาท
-                    </div>
+                <div id="pay-panel-bank" class="bg-slate-950 border border-emerald-500/30 rounded-2xl p-4 space-y-2 text-xs">
+                    <p class="text-emerald-400 font-bold"><i class="fa-solid fa-building-columns"></i> บัญชีธนาคาร</p>
+                    <p>ธนาคาร: <span id="display-bank-name" class="text-white font-bold">-</span></p>
+                    <p>เลขที่บัญชี: <span id="display-bank-acc-no" class="text-amber-400 font-mono font-bold text-sm">-</span></p>
+                    <p>ชื่อบัญชี: <span id="display-bank-acc-name" class="text-white">-</span></p>
+                    <p class="text-emerald-400 font-black text-base pt-1">ยอดโอน: <span class="checkout-price-display">0</span> บาท</p>
+                </div>
+                <div id="pay-panel-promptpay" class="hidden bg-slate-950 border border-cyan-500/30 rounded-2xl p-4 text-center space-y-2">
+                    <div class="bg-white p-2 rounded-xl inline-block"><img id="checkout-qr-img" src="" class="w-40 h-40 object-contain"></div>
+                    <p class="text-xs text-slate-300">พร้อมเพย์: <span id="display-promptpay-no" class="text-white font-mono">-</span></p>
+                    <p class="text-emerald-400 font-black text-base">ยอดโอน: <span class="checkout-price-display">0</span> บาท</p>
                 </div>
 
-                <!-- 2. PROMPTPAY / QR PANEL -->
-                <div id="pay-panel-promptpay" class="hidden bg-slate-950 border border-cyan-500/30 rounded-2xl p-4 text-center space-y-3">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-xs font-bold">
-                        <i class="fa-solid fa-qrcode"></i> สแกนชำระเงิน QR Code / PromptPay
-                    </div>
-
-                    <div class="bg-white p-3 rounded-xl inline-block shadow-lg mx-auto">
-                        <img id="checkout-qr-img" src="" alt="Payment QR Code" class="w-44 h-44 mx-auto object-contain">
-                    </div>
-
-                    <div class="text-xs text-slate-300 space-y-1">
-                        <p>หมายเลขพร้อมเพย์: <strong id="display-promptpay-no" class="text-white font-mono text-sm">-</strong> 
-                            <button type="button" onclick="copyCurrentPromptPayNo()" class="text-amber-400 underline hover:text-amber-300 ml-1">คัดลอก</button>
-                        </p>
-                        <p>ชื่อบัญชี: <strong id="display-promptpay-acc-name" class="text-white">-</strong></p>
-                        <p class="text-emerald-400 font-black text-base">ยอดที่ต้องโอน: <span class="checkout-price-display">0</span> บาท</p>
-                    </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">ช่องทางติดต่อ (Line / FB) *</label>
+                    <input type="text" id="checkout-contact" required placeholder="@myline" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200">
                 </div>
-
-                <!-- Customer Details & Slip Upload -->
-                <div class="space-y-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">ชื่อผู้ซื้อ / ช่องทางติดต่อ (Line ID / FB / เบอร์โทร) *</label>
-                        <input type="text" id="checkout-contact" required placeholder="เช่น Line: @myline หรือ FB: Somchai MLBB" 
-                               class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-emerald-400 mb-1">
-                            <i class="fa-solid fa-file-arrow-up mr-1"></i> แนบสลิปโอนเงินจากมือถือ (เลือกไฟล์รูปสลิป) *
-                        </label>
-                        <input type="file" id="checkout-slip-file" accept="image/*" onchange="handleSlipFileUpload(event)"
-                               class="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500 bg-slate-950 border border-slate-700 rounded-xl p-1 cursor-pointer">
-                        <input type="hidden" id="checkout-slip-url" value="">
-
-                        <div id="checkout-slip-preview-box" class="mt-2 hidden">
-                            <img id="checkout-slip-preview-img" src="" class="w-24 h-32 object-cover rounded-lg border border-slate-700">
-                        </div>
-                    </div>
+                <div>
+                    <label class="block text-xs font-semibold text-emerald-400 mb-1">แนบสลิปโอนเงิน *</label>
+                    <input type="file" id="checkout-slip-file" accept="image/*" onchange="handleSlipFileUpload(event)" class="w-full text-xs text-slate-400 bg-slate-950 border border-slate-700 rounded-xl p-1">
+                    <input type="hidden" id="checkout-slip-url" value="">
+                    <div id="checkout-slip-preview-box" class="mt-2 hidden"><img id="checkout-slip-preview-img" src="" class="w-24 h-32 object-cover rounded-lg"></div>
                 </div>
-
-                <div class="flex justify-end gap-3 pt-2">
-                    <button type="button" onclick="closeModal('modal-checkout')" class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-sm font-semibold">
-                        ยกเลิก
-                    </button>
-                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:brightness-110 text-white font-bold text-sm shadow-lg shadow-emerald-600/30">
-                        <i class="fa-solid fa-paper-plane mr-1"></i> ส่งหลักฐานการโอนเงิน
-                    </button>
+                <div class="flex justify-end gap-3">
+                    <button type="button" onclick="closeModal('modal-checkout')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-sm">ยกเลิก</button>
+                    <button type="submit" class="px-6 py-2 rounded-xl bg-emerald-600 text-white font-bold text-sm">ส่งสลิปชำระเงิน</button>
                 </div>
             </form>
         </div>
     </div>
 
-
-    <!-- 4. SLIP PREVIEW MODAL (ADMIN) -->
     <div id="modal-slip-preview" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-4 space-y-3 relative text-center">
-            <button onclick="closeModal('modal-slip-preview')" class="absolute top-3 right-3 text-slate-400 hover:text-white">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <h4 class="text-sm font-bold text-white">ตรวจสอบสลิปโอนเงิน</h4>
-            <div class="bg-black rounded-xl overflow-hidden max-h-[70vh] flex items-center justify-center">
-                <img id="slip-preview-img" src="" class="max-w-full max-h-full object-contain">
-            </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-4 space-y-3 text-center relative">
+            <button onclick="closeModal('modal-slip-preview')" class="absolute top-3 right-3 text-slate-400"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h4 class="text-sm font-bold text-white">ตรวจสอบสลิป</h4>
+            <div class="bg-black rounded-xl overflow-hidden max-h-[70vh] flex items-center justify-center"><img id="slip-preview-img" class="max-w-full max-h-full object-contain"></div>
         </div>
     </div>
 
-
-    <!-- TOAST NOTIFICATION -->
     <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
-        <div id="toast-content" class="bg-slate-900 border border-amber-500/40 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3">
-            <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <div class="bg-slate-900 border border-amber-500/40 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+            <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
             <span id="toast-msg" class="text-sm font-semibold">แจ้งเตือน</span>
         </div>
     </div>
 
-
-    <!-- APPLICATION LOGIC -->
+    <!-- APPLICATION LOGIC (CLOUD SYNCED) -->
     <script>
-        // LocalStorage Keys
-        const STORAGE_KEY_ACCOUNTS = 'mlbb_outfit_accounts_v1';
-        const STORAGE_KEY_ORDERS = 'mlbb_outfit_orders_v1';
-        const STORAGE_KEY_BANK = 'mlbb_outfit_bank_v1';
-        const STORAGE_KEY_ADMIN_AUTH = 'mlbb_outfit_admin_auth_v1';
-
-        // Default Admin Credentials
-        const DEFAULT_ADMIN_AUTH = {
-            username: 'admin',
-            password: 'mlbb1234'
-        };
-
-        // Default Bank Settings
-        const DEFAULT_BANK_SETTINGS = {
-            bankName: 'ธนาคารกสิกรไทย (K-Bank)',
-            accountNo: '123-4-56789-0',
-            accountName: 'ร้าน MLBB เครื่องแต่ง (Official)',
-            promptpayNo: '089-595-9595',
-            qrImageUrl: ''
-        };
-
-        // Mock Initial Accounts Data
-        const DEFAULT_ACCOUNTS = [
-            {
-                id: 'MLBB-5901',
-                game: 'MLBB',
-                tag: 'Collector Gusion + Prime Beatrix',
-                title: '[MLBB เครื่องแต่ง] ไอดี Collector Gusion Night Owl + Prime Beatrix M4 + Legend Franco',
-                price: 1990,
-                oldPrice: 2800,
-                rank: 'Mythical Immortal (135 Stars)',
-                skins: '265 Skins (Collector, Legend, Prime, Sanrio)',
-                heroes: '124 Heroes (ครบทุกตัว)',
-                images: [
-                    'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=80',
-                    'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&auto=format&fit=crop&q=80',
-                    'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=800&auto=format&fit=crop&q=80'
-                ],
-                desc: 'เครื่องแต่งจัดเต็มมาก สกินคอลเลกเตอร์ Gusion, Ling, Granger ครบเซ็ต เอฟเฟกต์วาร์ป M3 สะอาด 100% ไม่ติดเบอร์ เปลี่ยนอีเมล Moonton ได้ทันที',
-                loginId: 'mlbb_outfit5901@gmail.com',
-                loginPass: 'MlbbOutfitPass99!',
-                status: 'AVAILABLE',
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: 'MLBB-5902',
-                game: 'MLBB',
-                tag: 'Aspirants Lesley & Fanny',
-                title: '[MLBB เครื่องแต่ง] สายอนิเมะ Aspirants Lesley + Fanny + KOF Chou สกินแน่น',
-                price: 1450,
-                oldPrice: 1950,
-                rank: 'Mythic Glory (75 Stars)',
-                skins: '180 Skins',
-                heroes: '120 Heroes',
-                images: [
-                    'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&auto=format&fit=crop&q=80',
-                    'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=80'
-                ],
-                desc: 'ไอดีเครื่องแต่งสายอนิเมะ Aspirants เสียงพากย์ญี่ปุ่นครบ มีสกิน KOF Iori Chou สะอาด ปลอดภัย มีประกันหลังการขาย',
-                loginId: 'anime_mlbb5902@gmail.com',
-                loginPass: 'PassAnime5959',
-                status: 'AVAILABLE',
-                createdAt: new Date().toISOString()
-            }
-        ];
-
-        // State
         let accounts = [];
         let orders = [];
-        let bankSettings = { ...DEFAULT_BANK_SETTINGS };
-        let adminAuth = { ...DEFAULT_ADMIN_AUTH };
-        let isAdminLoggedIn = false;
-        let currentDetailImageIndex = 0;
-        let uploadedAccountFiles = [];
-
-        // INIT
-        window.addEventListener('DOMContentLoaded', () => {
-            loadState();
-            refreshAllViews();
-        });
-
-        function loadState() {
-            const storedAccs = localStorage.getItem(STORAGE_KEY_ACCOUNTS);
-            if (storedAccs) {
-                accounts = JSON.parse(storedAccs);
-            } else {
-                accounts = [...DEFAULT_ACCOUNTS];
-                saveAccounts();
-            }
-
-            const storedOrders = localStorage.getItem(STORAGE_KEY_ORDERS);
-            if (storedOrders) {
-                orders = JSON.parse(storedOrders);
-            } else {
-                orders = [];
-            }
-
-            const storedBank = localStorage.getItem(STORAGE_KEY_BANK);
-            if (storedBank) {
-                bankSettings = JSON.parse(storedBank);
-            } else {
-                bankSettings = { ...DEFAULT_BANK_SETTINGS };
-                saveBankSettings();
-            }
-
-            const storedAuth = localStorage.getItem(STORAGE_KEY_ADMIN_AUTH);
-            if (storedAuth) {
-                adminAuth = JSON.parse(storedAuth);
-            } else {
-                adminAuth = { ...DEFAULT_ADMIN_AUTH };
-                saveAdminAuth();
-            }
-
-            updateOrderBadge();
-            populateAdminBankForm();
-        }
-
-        function saveAccounts() {
-            localStorage.setItem(STORAGE_KEY_ACCOUNTS, JSON.stringify(accounts));
-        }
-
-        function saveOrders() {
-            localStorage.setItem(STORAGE_KEY_ORDERS, JSON.stringify(orders));
-            updateOrderBadge();
-        }
-
-        function saveBankSettings() {
-            localStorage.setItem(STORAGE_KEY_BANK, JSON.stringify(bankSettings));
-        }
-
-        function saveAdminAuth() {
-            localStorage.setItem(STORAGE_KEY_ADMIN_AUTH, JSON.stringify(adminAuth));
-        }
-
-        function refreshAllViews() {
-            renderHomeFeatured();
-            renderCatalog();
-            renderAdminInventory();
-            renderAdminOrders();
-            renderUserOrders();
-            updateAdminStats();
-        }
-
-        // NAVIGATION & ADMIN PROTECTION
-        function navigateTo(viewName, param = null) {
-            // Protected Admin View Check
-            if (viewName === 'admin' && !isAdminLoggedIn) {
-                document.getElementById('login-error-msg').classList.add('hidden');
-                document.getElementById('login-username').value = '';
-                document.getElementById('login-password').value = '';
-                document.getElementById('modal-admin-login').classList.remove('hidden');
-                return;
-            }
-
-            const views = ['home', 'catalog', 'detail', 'orders', 'admin'];
-            views.forEach(v => {
-                const el = document.getElementById(`view-${v}`);
-                if (el) el.classList.add('hidden');
-            });
-
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.className = "nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-300 hover:text-white hover:bg-slate-800/60";
-            });
-
-            const activeBtn = document.getElementById(`nav-${viewName}`);
-            if (activeBtn) {
-                if(viewName === 'admin') {
-                    activeBtn.className = "nav-btn px-4 py-2 rounded-xl text-sm font-medium transition-all text-amber-400 bg-amber-500/10 border border-amber-500/30 ml-2";
-                } else {
-                    activeBtn.className = "nav-btn px-4 py-2 rounded-xl text-sm font-medium transition-all text-amber-400 bg-amber-950/40 border border-amber-500/30";
-                }
-            }
-
-            const targetView = document.getElementById(`view-${viewName}`);
-            if (targetView) targetView.classList.remove('hidden');
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-
-            if (viewName === 'detail' && param) {
-                renderAccountDetail(param);
-            } else if (viewName === 'catalog') {
-                renderCatalog();
-            } else if (viewName === 'orders') {
-                renderUserOrders();
-            }
-        }
-
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
-        }
-
-        // ADMIN LOGIN / LOGOUT LOGIC
-        function handleAdminLoginSubmit(e) {
-            e.preventDefault();
-            const uInput = document.getElementById('login-username').value.trim();
-            const pInput = document.getElementById('login-password').value.trim();
-
-            if (uInput === adminAuth.username && pInput === adminAuth.password) {
-                isAdminLoggedIn = true;
-                closeModal('modal-admin-login');
-                showToast('เข้าสู่ระบบ Admin สำเร็จแล้ว');
-                navigateTo('admin');
-            } else {
-                document.getElementById('login-error-msg').classList.remove('hidden');
-            }
-        }
-
-        function handleAdminLogout() {
-            if (confirm('คุณต้องการออกจากระบบ Admin หรือไม่?')) {
-                isAdminLoggedIn = false;
-                navigateTo('home');
-                showToast('ออกจากระบบ Admin เรียบร้อยแล้ว');
-            }
-        }
-
-        function handleAdminPasswordChange(e) {
-            e.preventDefault();
-            const uInput = document.getElementById('change-pass-username').value.trim();
-            const pInput = document.getElementById('change-pass-new').value.trim();
-
-            if (pInput.length < 4) {
-                alert('กรุณาตั้งรหัสผ่านอย่างน้อย 4 ตัวอักษรขึ้นไป');
-                return;
-            }
-
-            adminAuth.username = uInput;
-            adminAuth.password = pInput;
-            saveAdminAuth();
-
-            showToast('อัปเดตรหัสผ่านแอดมินใหม่สำเร็จ!');
-            document.getElementById('change-pass-new').value = '';
-        }
-
-        // HOME PAGE RENDER
-        function renderHomeFeatured() {
-            const grid = document.getElementById('home-featured-grid');
-            if (!grid) return;
-
-            const featured = accounts.slice(0, 6);
-            if (featured.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500">ไม่มีรายการไอดีในขณะนี้</div>`;
-                return;
-            }
-
-            grid.innerHTML = featured.map(acc => createAccountCardHTML(acc)).join('');
-        }
-
-        // CATALOG PAGE RENDER
-        function renderCatalog() {
-            const grid = document.getElementById('catalog-grid');
-            if (!grid) return;
-
-            const searchVal = document.getElementById('filter-search')?.value.toLowerCase() || '';
-            const rankVal = document.getElementById('filter-rank')?.value || 'ALL';
-            const statusVal = document.getElementById('filter-status')?.value || 'ALL';
-
-            const filtered = accounts.filter(acc => {
-                const matchesSearch = acc.title.toLowerCase().includes(searchVal) || 
-                                      acc.id.toLowerCase().includes(searchVal) ||
-                                      (acc.tag && acc.tag.toLowerCase().includes(searchVal));
-                
-                const matchesRank = (rankVal === 'ALL') || (acc.rank && acc.rank.includes(rankVal));
-                const matchesStatus = (statusVal === 'ALL') || (acc.status === statusVal);
-
-                return matchesSearch && matchesRank && matchesStatus;
-            });
-
-            if (filtered.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-full text-center py-16 bg-slate-900/50 rounded-2xl border border-slate-800">
-                        <i class="fa-solid fa-shirt text-4xl text-slate-600 mb-3"></i>
-                        <p class="text-slate-400">ไม่พบไอดี MLBB เครื่องแต่ง ที่ตรงกับคำค้นหาของคุณ</p>
-                    </div>
-                `;
-                return;
-            }
-
-            grid.innerHTML = filtered.map(acc => createAccountCardHTML(acc)).join('');
-        }
-
-        function applyFilters() {
-            renderCatalog();
-        }
-
-        // CARD COMPONENT
-        function createAccountCardHTML(acc) {
-            const mainImg = acc.images && acc.images.length > 0 ? acc.images[0] : 'https://placehold.co/600x400/1e293b/a855f7?text=MLBB+Outfit';
-            const imageCount = acc.images ? acc.images.length : 0;
-            const isSold = acc.status === 'SOLD';
-
-            return `
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-amber-500/50 transition-all duration-300 flex flex-col justify-between group shadow-xl">
-                    <div>
-                        <div class="relative aspect-video overflow-hidden bg-slate-950">
-                            <img src="${mainImg}" alt="${acc.title}" 
-                                 onerror="this.src='https://placehold.co/600x400/1e293b/a855f7?text=MLBB+Outfit'"
-                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${isSold ? 'grayscale brightness-50' : ''}">
-                            
-                            <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                                <span class="px-2.5 py-0.5 rounded-md text-xs font-black bg-slate-950/90 backdrop-blur-md text-amber-400 border border-amber-500/40">
-                                    MLBB เครื่องแต่ง
-                                </span>
-                            </div>
-
-                            ${imageCount > 1 ? `
-                                <div class="absolute bottom-3 right-3 px-2 py-0.5 rounded-md text-[11px] bg-slate-950/80 backdrop-blur-md text-slate-300 border border-slate-700 flex items-center gap-1 font-semibold">
-                                    <i class="fa-solid fa-images text-cyan-400"></i> ${imageCount} รูปสกิน
-                                </div>
-                            ` : ''}
-
-                            ${isSold ? `
-                                <div class="absolute inset-0 flex items-center justify-center bg-black/70 backdrop-blur-[2px]">
-                                    <span class="px-4 py-1.5 rounded-xl bg-red-600/90 text-white font-black text-sm tracking-wider uppercase shadow-lg">
-                                        ขายแล้ว (SOLD OUT)
-                                    </span>
-                                </div>
-                            ` : ''}
-                        </div>
-
-                        <div class="p-5 space-y-3">
-                            <div class="flex items-center justify-between text-xs text-slate-400">
-                                <span class="font-mono text-amber-400 font-bold">${acc.id}</span>
-                                <span class="truncate max-w-[150px]"><i class="fa-solid fa-trophy text-amber-400 mr-1"></i> ${acc.rank || 'ไม่ระบุ'}</span>
-                            </div>
-
-                            <h3 class="font-bold text-white text-base line-clamp-2 hover:text-amber-300 transition-colors cursor-pointer" onclick="navigateTo('detail', '${acc.id}')">
-                                ${acc.title}
-                            </h3>
-
-                            <div class="flex items-center gap-3 text-xs text-slate-400">
-                                <span><i class="fa-solid fa-shirt text-pink-400 mr-1"></i> ${acc.skins || '-'}</span>
-                                <span><i class="fa-solid fa-user-ninja text-purple-400 mr-1"></i> ${acc.heroes || '-'}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="px-5 pb-5 pt-2 border-t border-slate-800/60 flex items-center justify-between">
-                        <div>
-                            <div class="flex items-baseline gap-1.5">
-                                <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
-                                    ฿${Number(acc.price).toLocaleString()}
-                                </span>
-                                ${acc.oldPrice ? `<span class="text-xs text-slate-500 line-through">฿${Number(acc.oldPrice).toLocaleString()}</span>` : ''}
-                            </div>
-                        </div>
-
-                        <button onclick="navigateTo('detail', '${acc.id}')" 
-                                class="px-4 py-2 rounded-xl bg-amber-500/10 text-amber-300 hover:bg-amber-500 hover:text-slate-950 border border-amber-500/30 text-xs font-bold transition-all flex items-center gap-1.5">
-                            ดูรายละเอียด <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        // ACCOUNT DETAIL PAGE RENDER
-        function renderAccountDetail(accId) {
-            const container = document.getElementById('detail-container');
-            const acc = accounts.find(a => a.id === accId);
-
-            if (!acc) {
-                container.innerHTML = `<div class="col-span-full text-center py-20 text-slate-400">ไม่พบรายการไอดี MLBB เครื่องแต่ง นี้</div>`;
-                return;
-            }
-
-            currentDetailImageIndex = 0;
-            const images = acc.images && acc.images.length > 0 ? acc.images : ['https://placehold.co/800x500/1e293b/a855f7?text=MLBB+Outfit'];
-            const isSold = acc.status === 'SOLD';
-
-            container.innerHTML = `
-                <div class="lg:col-span-7 space-y-4">
-                    <div class="relative rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 aspect-video shadow-2xl group">
-                        <img id="detail-main-img" src="${images[0]}" alt="${acc.title}" 
-                             onerror="this.src='https://placehold.co/800x500/1e293b/a855f7?text=MLBB+Outfit'"
-                             class="w-full h-full object-contain bg-black/40">
-
-                        ${images.length > 1 ? `
-                            <button onclick="slideDetailImage(-1, ${images.length})" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-amber-500 hover:text-slate-950 text-white flex items-center justify-center backdrop-blur-md transition-all shadow-lg">
-                                <i class="fa-solid fa-chevron-left"></i>
-                            </button>
-                            <button onclick="slideDetailImage(1, ${images.length})" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-amber-500 hover:text-slate-950 text-white flex items-center justify-center backdrop-blur-md transition-all shadow-lg">
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </button>
-                        ` : ''}
-
-                        <div class="absolute bottom-3 left-3 px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md text-xs text-slate-300 border border-slate-800 font-semibold">
-                            รูปสกินที่ <span id="img-counter-idx" class="text-amber-400">1</span> / ${images.length}
-                        </div>
-                    </div>
-
-                    ${images.length > 1 ? `
-                        <div class="flex items-center gap-3 overflow-x-auto pb-2 custom-scrollbar">
-                            ${images.map((img, idx) => `
-                                <button onclick="setDetailImage(${idx})" class="thumb-btn flex-shrink-0 w-20 h-14 rounded-xl overflow-hidden border-2 ${idx === 0 ? 'border-amber-400' : 'border-slate-800 opacity-60'} hover:opacity-100 transition-all">
-                                    <img src="${img}" class="w-full h-full object-cover">
-                                </button>
-                            `).join('')}
-                        </div>
-                    ` : ''}
-                </div>
-
-                <div class="lg:col-span-5 space-y-6">
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
-                        <div>
-                            <div class="flex items-center justify-between gap-2 mb-2">
-                                <span class="px-3 py-1 rounded-full text-xs font-black bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                                    MLBB เครื่องแต่ง
-                                </span>
-                                <span class="text-xs text-slate-400 font-mono">รหัสสินค้า: ${acc.id}</span>
-                            </div>
-                            <h1 class="text-xl sm:text-2xl font-black text-white leading-snug">${acc.title}</h1>
-                        </div>
-
-                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex items-center justify-between">
-                            <div>
-                                <span class="text-xs text-slate-400 block">ราคาขายสุทธิ (แอดมินปรับได้ตลอด)</span>
-                                <div class="flex items-baseline gap-2">
-                                    <span class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">
-                                        ฿${Number(acc.price).toLocaleString()}
-                                    </span>
-                                    ${acc.oldPrice ? `<span class="text-sm text-slate-500 line-through">฿${Number(acc.oldPrice).toLocaleString()}</span>` : ''}
-                                </div>
-                            </div>
-                            <div>
-                                <span class="px-3 py-1 rounded-lg text-xs font-bold ${isSold ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}">
-                                    ${isSold ? 'ขายแล้ว' : 'พร้อมจำหน่าย'}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="space-y-3">
-                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">รายละเอียดสกิน & สเปกไอดี</h4>
-                            <div class="grid grid-cols-2 gap-3 text-sm">
-                                <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
-                                    <span class="text-xs text-slate-400 block"><i class="fa-solid fa-trophy text-amber-400 mr-1"></i> แร้งค์ MLBB</span>
-                                    <span class="font-bold text-slate-200">${acc.rank || '-'}</span>
-                                </div>
-                                <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
-                                    <span class="text-xs text-slate-400 block"><i class="fa-solid fa-shirt text-pink-400 mr-1"></i> เครื่องแต่ง / สกิน</span>
-                                    <span class="font-bold text-slate-200">${acc.skins || '-'}</span>
-                                </div>
-                                <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 col-span-2">
-                                    <span class="text-xs text-slate-400 block"><i class="fa-solid fa-user-ninja text-purple-400 mr-1"></i> ฮีโร่สะสม</span>
-                                    <span class="font-bold text-slate-200">${acc.heroes || '-'}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="space-y-2">
-                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">รายละเอียดเพิ่มเติมและการผูก</h4>
-                            <div class="bg-slate-950/50 p-4 rounded-xl border border-slate-800 text-xs text-slate-300 leading-relaxed whitespace-pre-line">
-                                ${acc.desc || 'ไม่มีรายละเอียดเพิ่มเติม'}
-                            </div>
-                        </div>
-
-                        <div>
-                            ${isSold ? `
-                                <button disabled class="w-full py-3.5 rounded-xl bg-slate-800 text-slate-500 font-bold cursor-not-allowed text-center">
-                                    ไอดีเครื่องแต่งนี้ถูกขายแล้ว (Sold Out)
-                                </button>
-                            ` : `
-                                <button onclick="openCheckoutModal('${acc.id}')" 
-                                        class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-purple-600 to-pink-600 hover:brightness-110 text-white font-black text-base shadow-lg shadow-purple-600/30 transition-all flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-cart-shopping"></i> สั่งซื้อไอดี MLBB นี้ทันที
-                                </button>
-                            `}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function slideDetailImage(direction, total) {
-            currentDetailImageIndex = (currentDetailImageIndex + direction + total) % total;
-            setDetailImage(currentDetailImageIndex);
-        }
-
-        function setDetailImage(idx) {
-            currentDetailImageIndex = idx;
-            const detailView = document.getElementById('view-detail');
-            const mainImg = document.getElementById('detail-main-img');
-            const counter = document.getElementById('img-counter-idx');
-            const accIdText = detailView.querySelector('.font-mono')?.textContent?.replace('รหัสสินค้า: ', '');
-            const acc = accounts.find(a => a.id === accIdText);
-
-            if (acc && acc.images && acc.images[idx]) {
-                mainImg.src = acc.images[idx];
-                if (counter) counter.textContent = idx + 1;
-            }
-        }
-
-        // CHECKOUT & PAYMENT MODAL SYSTEM
-        function openCheckoutModal(accId) {
-            const acc = accounts.find(a => a.id === accId);
-            if (!acc) return;
-
-            document.getElementById('checkout-acc-id').value = acc.id;
-            
-            const priceDisplays = document.querySelectorAll('.checkout-price-display');
-            priceDisplays.forEach(el => el.textContent = Number(acc.price).toLocaleString());
-
-            document.getElementById('display-bank-name').innerHTML = `<i class="fa-solid fa-money-check-dollar text-emerald-400"></i> ${bankSettings.bankName}`;
-            document.getElementById('display-bank-acc-no').textContent = bankSettings.accountNo;
-            document.getElementById('display-bank-acc-name').textContent = bankSettings.accountName;
-
-            document.getElementById('display-promptpay-no').textContent = bankSettings.promptpayNo;
-            document.getElementById('display-promptpay-acc-name').textContent = bankSettings.accountName;
-
-            const qrImg = document.getElementById('checkout-qr-img');
-            if (bankSettings.qrImageUrl && bankSettings.qrImageUrl.trim() !== '') {
-                qrImg.src = bankSettings.qrImageUrl;
-            } else {
-                const cleanPromptpay = bankSettings.promptpayNo.replace(/[^0-9]/g, '');
-                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=PROMPTPAY-${cleanPromptpay}-AMOUNT-${acc.price}`;
-            }
-
-            const summaryBox = document.getElementById('checkout-summary');
-            const mainImg = acc.images && acc.images[0] ? acc.images[0] : '';
-            summaryBox.innerHTML = `
-                <img src="${mainImg}" class="w-16 h-12 object-cover rounded-lg border border-slate-700">
-                <div class="overflow-hidden">
-                    <h4 class="font-bold text-white text-sm truncate">${acc.title}</h4>
-                    <p class="text-xs text-amber-400 font-mono">${acc.id} (MLBB เครื่องแต่ง)</p>
-                </div>
-            `;
-
-            switchPayTab('bank');
-            document.getElementById('checkout-slip-file').value = '';
-            document.getElementById('checkout-slip-url').value = '';
-            document.getElementById('checkout-slip-preview-box').classList.add('hidden');
-            document.getElementById('modal-checkout').classList.remove('hidden');
-        }
-
-        function switchPayTab(tab) {
-            const bankPanel = document.getElementById('pay-panel-bank');
-            const promptpayPanel = document.getElementById('pay-panel-promptpay');
-            const bankBtn = document.getElementById('pay-tab-bank');
-            const promptpayBtn = document.getElementById('pay-tab-promptpay');
-
-            if (tab === 'bank') {
-                bankPanel.classList.remove('hidden');
-                promptpayPanel.classList.add('hidden');
-                bankBtn.className = "w-1/2 pb-2 text-sm font-bold border-b-2 border-emerald-400 text-emerald-400 text-center";
-                promptpayBtn.className = "w-1/2 pb-2 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 text-center";
-            } else {
-                bankPanel.classList.add('hidden');
-                promptpayPanel.classList.remove('hidden');
-                promptpayBtn.className = "w-1/2 pb-2 text-sm font-bold border-b-2 border-cyan-400 text-cyan-400 text-center";
-                bankBtn.className = "w-1/2 pb-2 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 text-center";
-            }
-        }
-
-        function copyCurrentBankAccNo() {
-            copyToClipboard(bankSettings.accountNo.replace(/[^0-9]/g, ''));
-            showToast('คัดลอกเลขที่บัญชีแล้ว!');
-        }
-
-        function copyCurrentPromptPayNo() {
-            copyToClipboard(bankSettings.promptpayNo.replace(/[^0-9]/g, ''));
-            showToast('คัดลอกหมายเลข PromptPay แล้ว!');
-        }
-
-        function handleSlipFileUpload(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    const base64Img = evt.target.result;
-                    document.getElementById('checkout-slip-url').value = base64Img;
-                    document.getElementById('checkout-slip-preview-img').src = base64Img;
-                    document.getElementById('checkout-slip-preview-box').classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function handleCheckoutSubmit(e) {
-            e.preventDefault();
-            const accId = document.getElementById('checkout-acc-id').value;
-            const contact = document.getElementById('checkout-contact').value;
-            const slipUrl = document.getElementById('checkout-slip-url').value;
-
-            if (!slipUrl) {
-                alert('กรุณาเลือกไฟล์รูปสลิปโอนเงินก่อนส่งหลักฐาน');
-                return;
-            }
-
-            const acc = accounts.find(a => a.id === accId);
-            if (!acc) return;
-
-            const newOrder = {
-                orderId: 'ORD-MLBB-' + Math.floor(100000 + Math.random() * 900000),
-                accId: acc.id,
-                accTitle: acc.title,
-                price: acc.price,
-                contact: contact,
-                slipUrl: slipUrl,
-                status: 'PENDING',
-                createdAt: new Date().toLocaleString('th-TH')
-            };
-
-            orders.unshift(newOrder);
-            saveOrders();
-
-            closeModal('modal-checkout');
-            showToast('ส่งหลักฐานโอนเงินเรียบร้อยแล้ว! รอแอดมินอนุมัติรหัสผ่าน');
-            navigateTo('orders');
-
-            document.getElementById('checkout-contact').value = '';
-            document.getElementById('checkout-slip-url').value = '';
-        }
-
-        function renderUserOrders() {
-            const container = document.getElementById('orders-list-container');
-            if (!container) return;
-
-            if (orders.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-16 bg-slate-900/50 rounded-2xl border border-slate-800">
-                        <i class="fa-solid fa-receipt text-4xl text-slate-600 mb-3"></i>
-                        <p class="text-slate-400">คุณยังไม่มีประวัติรายการสั่งซื้อไอดี</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = orders.map(ord => {
-                const acc = accounts.find(a => a.id === ord.accId);
-                let statusBadge = '';
-                
-                if (ord.status === 'PENDING') {
-                    statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
-                                    <i class="fa-solid fa-clock animate-spin"></i> รอแอดมินอนุมัติสลิป
-                                   </span>`;
-                } else if (ord.status === 'APPROVED') {
-                    statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-                                    <i class="fa-solid fa-circle-check"></i> อนุมัติแล้ว (อนุมัติรหัสผ่าน)
-                                   </span>`;
-                } else {
-                    statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-red-500/20 text-red-400 border border-red-500/30 flex items-center gap-1">
-                                    <i class="fa-solid fa-circle-xmark"></i> ถูกปฏิเสธสลิป
-                                   </span>`;
-                }
-
-                return `
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-                        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
-                            <div>
-                                <span class="text-xs text-slate-400">เลขที่คำสั่งซื้อ:</span>
-                                <span class="text-sm font-mono font-bold text-amber-400 ml-1">${ord.orderId}</span>
-                                <span class="text-xs text-slate-500 ml-3">(${ord.createdAt})</span>
-                            </div>
-                            ${statusBadge}
-                        </div>
-
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                            <div>
-                                <h4 class="font-bold text-white text-base">${ord.accTitle}</h4>
-                                <p class="text-xs text-slate-400">รหัสสินค้า: <span class="font-mono text-purple-300">${ord.accId}</span> | ติดต่อ: ${ord.contact}</p>
-                            </div>
-                            <div class="text-right">
-                                <span class="text-xs text-slate-400 block">ยอดชำระ</span>
-                                <span class="text-xl font-black text-emerald-400">฿${Number(ord.price).toLocaleString()}</span>
-                            </div>
-                        </div>
-
-                        ${ord.status === 'APPROVED' && acc ? `
-                            <div class="bg-gradient-to-r from-purple-950/80 to-slate-950 border border-purple-500/50 p-4 rounded-xl space-y-2">
-                                <div class="flex items-center justify-between">
-                                    <h5 class="text-xs font-black text-amber-300 flex items-center gap-1.5 uppercase">
-                                        <i class="fa-solid fa-key text-amber-400"></i> ข้อมูลเข้าเล่นไอดี MLBB เครื่องแต่ง (เฉพาะคุณ)
-                                    </h5>
-                                    <span class="text-[10px] bg-purple-500/30 text-purple-200 px-2 py-0.5 rounded font-bold">โอนสิทธิ์แล้ว</span>
-                                </div>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono pt-1">
-                                    <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex items-center justify-between">
-                                        <span class="text-slate-400">ID/Email: <strong class="text-white select-all">${acc.loginId || 'mlbb_user@gmail.com'}</strong></span>
-                                        <button onclick="copyToClipboard('${acc.loginId || ''}')" class="text-purple-400 hover:text-purple-300 text-xs"><i class="fa-solid fa-copy"></i></button>
-                                    </div>
-                                    <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex items-center justify-between">
-                                        <span class="text-slate-400">Password: <strong class="text-emerald-400 select-all">${acc.loginPass || 'Pass1234'}</strong></span>
-                                        <button onclick="copyToClipboard('${acc.loginPass || ''}')" class="text-purple-400 hover:text-purple-300 text-xs"><i class="fa-solid fa-copy"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function updateOrderBadge() {
-            const badge = document.getElementById('order-badge');
-            if (badge) {
-                if (orders.length > 0) {
-                    badge.textContent = orders.length;
-                    badge.classList.remove('hidden');
-                } else {
-                    badge.classList.add('hidden');
-                }
-            }
-        }
-
-        // ADMIN BACKOFFICE & BANK SETTINGS LOGIC
-        function switchAdminTab(tab) {
-            document.getElementById('admin-sec-inventory').classList.add('hidden');
-            document.getElementById('admin-sec-bank').classList.add('hidden');
-            document.getElementById('admin-sec-orders').classList.add('hidden');
-            document.getElementById('admin-sec-settings').classList.add('hidden');
-            
-            document.getElementById('admin-tab-inventory').className = "pb-3 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200";
-            document.getElementById('admin-tab-bank').className = "pb-3 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200";
-            document.getElementById('admin-tab-orders').className = "pb-3 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200";
-            document.getElementById('admin-tab-settings').className = "pb-3 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200";
-
-            if (tab === 'inventory') {
-                document.getElementById('admin-sec-inventory').classList.remove('hidden');
-                document.getElementById('admin-tab-inventory').className = "pb-3 text-sm font-bold border-b-2 border-amber-400 text-amber-400";
-            } else if (tab === 'bank') {
-                document.getElementById('admin-sec-bank').classList.remove('hidden');
-                document.getElementById('admin-tab-bank').className = "pb-3 text-sm font-bold border-b-2 border-emerald-400 text-emerald-400";
-            } else if (tab === 'orders') {
-                document.getElementById('admin-sec-orders').classList.remove('hidden');
-                document.getElementById('admin-tab-orders').className = "pb-3 text-sm font-bold border-b-2 border-amber-400 text-amber-400";
-            } else if (tab === 'settings') {
-                document.getElementById('admin-sec-settings').classList.remove('hidden');
-                document.getElementById('admin-tab-settings').className = "pb-3 text-sm font-bold border-b-2 border-amber-400 text-amber-400";
-                document.getElementById('change-pass-username').value = adminAuth.username;
-            }
-        }
-
-        function populateAdminBankForm() {
-            document.getElementById('admin-bank-name').value = bankSettings.bankName || '';
-            document.getElementById('admin-bank-acc-no').value = bankSettings.accountNo || '';
-            document.getElementById('admin-bank-acc-name').value = bankSettings.accountName || '';
-            document.getElementById('admin-promptpay-no').value = bankSettings.promptpayNo || '';
-            document.getElementById('admin-qr-url').value = bankSettings.qrImageUrl || '';
-
-            if (bankSettings.qrImageUrl) {
-                document.getElementById('admin-qr-preview-img').src = bankSettings.qrImageUrl;
-                document.getElementById('admin-qr-preview-box').classList.remove('hidden');
-            }
-        }
-
-        function handleAdminQRFileUpload(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    const base64Img = evt.target.result;
-                    document.getElementById('admin-qr-url').value = base64Img;
-                    document.getElementById('admin-qr-preview-img').src = base64Img;
-                    document.getElementById('admin-qr-preview-box').classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function handleBankSettingsSubmit(e) {
-            e.preventDefault();
-            bankSettings = {
-                bankName: document.getElementById('admin-bank-name').value,
-                accountNo: document.getElementById('admin-bank-acc-no').value,
-                accountName: document.getElementById('admin-bank-acc-name').value,
-                promptpayNo: document.getElementById('admin-promptpay-no').value,
-                qrImageUrl: document.getElementById('admin-qr-url').value
-            };
-
-            saveBankSettings();
-            showToast('บันทึกข้อมูลบัญชีธนาคาร & QR Code เรียบร้อยแล้ว!');
-        }
-
-        function updateAdminStats() {
-            document.getElementById('stat-total-accounts').textContent = accounts.length;
-            document.getElementById('stat-available-accounts').textContent = accounts.filter(a => a.status === 'AVAILABLE').length;
-            document.getElementById('stat-total-orders').textContent = orders.length;
-        }
-
-        function renderAdminInventory() {
-            const tbody = document.getElementById('admin-inventory-table');
-            if (!tbody) return;
-
-            if (accounts.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-slate-500">ไม่มีข้อมูลสินค้า</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = accounts.map(acc => {
-                const mainImg = acc.images && acc.images[0] ? acc.images[0] : '';
-                const imgCount = acc.images ? acc.images.length : 0;
-                const isSold = acc.status === 'SOLD';
-
-                return `
-                    <tr class="hover:bg-slate-950/40">
-                        <td class="py-3 px-4">
-                            <img src="${mainImg}" class="w-14 h-10 object-cover rounded-lg border border-slate-700">
-                        </td>
-                        <td class="py-3 px-4">
-                            <div class="font-bold text-white text-sm max-w-xs truncate">${acc.title}</div>
-                            <div class="text-xs text-amber-400 font-mono">${acc.id}</div>
-                        </td>
-                        <td class="py-3 px-4 font-bold text-emerald-400">
-                            ฿${Number(acc.price).toLocaleString()}
-                        </td>
-                        <td class="py-3 px-4 text-xs text-slate-300">
-                            <i class="fa-solid fa-images text-cyan-400 mr-1"></i> ${imgCount} รูป
-                        </td>
-                        <td class="py-3 px-4">
-                            <span class="px-2 py-0.5 rounded text-[11px] font-bold ${isSold ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}">
-                                ${isSold ? 'ขายแล้ว' : 'พร้อมขาย'}
-                            </span>
-                        </td>
-                        <td class="py-3 px-4 text-center space-x-1">
-                            <button onclick="openQuickPriceModal('${acc.id}')" class="p-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs" title="ปรับราคาด่วน">
-                                <i class="fa-solid fa-tags"></i> ปรับราคา
-                            </button>
-                            <button onclick="openEditAccountModal('${acc.id}')" class="p-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs" title="แก้ไข">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <button onclick="deleteAccount('${acc.id}')" class="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs" title="ลบ">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function renderAdminOrders() {
-            const tbody = document.getElementById('admin-orders-table');
-            if (!tbody) return;
-
-            if (orders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-slate-500">ไม่มีคำสั่งซื้อ</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = orders.map(ord => {
-                let statusBadge = '';
-                if (ord.status === 'PENDING') {
-                    statusBadge = `<span class="px-2.5 py-0.5 rounded text-xs font-bold bg-amber-500/20 text-amber-300">รอตรวจสอบ</span>`;
-                } else if (ord.status === 'APPROVED') {
-                    statusBadge = `<span class="px-2.5 py-0.5 rounded text-xs font-bold bg-emerald-500/20 text-emerald-400">อนุมัติแล้ว</span>`;
-                } else {
-                    statusBadge = `<span class="px-2.5 py-0.5 rounded text-xs font-bold bg-red-500/20 text-red-400">ปฏิเสธ</span>`;
-                }
-
-                return `
-                    <tr class="hover:bg-slate-950/40">
-                        <td class="py-3 px-4 font-mono text-xs font-bold text-amber-400">${ord.orderId}</td>
-                        <td class="py-3 px-4 text-xs text-slate-300">${ord.contact}</td>
-                        <td class="py-3 px-4 text-xs font-semibold text-white truncate max-w-xs">${ord.accTitle}</td>
-                        <td class="py-3 px-4 text-xs font-bold text-emerald-400">฿${Number(ord.price).toLocaleString()}</td>
-                        <td class="py-3 px-4">
-                            <button onclick="previewSlip('${ord.slipUrl}')" class="text-xs text-cyan-400 underline hover:text-cyan-300">
-                                <i class="fa-solid fa-image"></i> ดูสลิป
-                            </button>
-                        </td>
-                        <td class="py-3 px-4">${statusBadge}</td>
-                        <td class="py-3 px-4 text-center space-x-1">
-                            ${ord.status === 'PENDING' ? `
-                                <button onclick="updateOrderStatus('${ord.orderId}', 'APPROVED')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow">
-                                    <i class="fa-solid fa-check"></i> อนุมัติสลิป
-                                </button>
-                                <button onclick="updateOrderStatus('${ord.orderId}', 'REJECTED')" class="px-2.5 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold text-xs">
-                                    <i class="fa-solid fa-xmark"></i> ปฏิเสธ
-                                </button>
-                            ` : `<span class="text-xs text-slate-500">ดำเนินการแล้ว</span>`}
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        // HANDLE ACCOUNT IMAGES MULTIPLE FILE UPLOAD FROM PHONE
-        function handleAccountFilesUpload(e) {
-            const files = Array.from(e.target.files);
-            if (files.length === 0) return;
-
-            let loadedCount = 0;
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    uploadedAccountFiles.push(evt.target.result);
-                    loadedCount++;
-                    if (loadedCount === files.length) {
-                        renderAccountImagesPreview();
-                    }
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        function renderAccountImagesPreview() {
-            const container = document.getElementById('acc-images-preview');
-            if (!container) return;
-
-            container.innerHTML = uploadedAccountFiles.map((src, idx) => `
-                <div class="relative w-16 h-16 rounded-lg overflow-hidden border border-slate-700 group">
-                    <img src="${src}" class="w-full h-full object-cover">
-                    <button type="button" onclick="removeUploadedAccountImage(${idx})" class="absolute top-0.5 right-0.5 bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        function removeUploadedAccountImage(idx) {
-            uploadedAccountFiles.splice(idx, 1);
-            renderAccountImagesPreview();
-        }
-
-        function openAddAccountModal() {
-            document.getElementById('form-account').reset();
-            document.getElementById('form-acc-id').value = '';
-            uploadedAccountFiles = [];
-            renderAccountImagesPreview();
-
-            document.getElementById('modal-account-title').innerHTML = `<i class="fa-solid fa-plus text-amber-400"></i> ลงขายไอดี MLBB เครื่องแต่ง ใหม่`;
-            document.getElementById('modal-account').classList.remove('hidden');
-        }
-
-        function openEditAccountModal(accId) {
-            const acc = accounts.find(a => a.id === accId);
-            if (!acc) return;
-
-            document.getElementById('form-acc-id').value = acc.id;
-            document.getElementById('form-acc-tag').value = acc.tag || '';
-            document.getElementById('form-acc-rank').value = acc.rank || '';
-            document.getElementById('form-acc-title').value = acc.title || '';
-            document.getElementById('form-acc-price').value = acc.price || '';
-            document.getElementById('form-acc-oldprice').value = acc.oldPrice || '';
-            document.getElementById('form-acc-skins').value = acc.skins || '';
-            document.getElementById('form-acc-heroes').value = acc.heroes || '';
-            document.getElementById('form-acc-desc').value = acc.desc || '';
-            document.getElementById('form-acc-login-id').value = acc.loginId || '';
-            document.getElementById('form-acc-login-pass').value = acc.loginPass || '';
-            document.getElementById('form-acc-status').value = acc.status || 'AVAILABLE';
-
-            uploadedAccountFiles = acc.images ? [...acc.images] : [];
-            renderAccountImagesPreview();
-
-            document.getElementById('modal-account-title').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> แก้ไขข้อมูลไอดี ${acc.id}`;
-            document.getElementById('modal-account').classList.remove('hidden');
-        }
-
-        function handleAccountFormSubmit(e) {
-            e.preventDefault();
-            const editId = document.getElementById('form-acc-id').value;
-            const imagesText = document.getElementById('form-acc-images').value;
-            const textUrlList = imagesText.split('\n').map(s => s.trim()).filter(s => s.length > 0);
-
-            const finalImages = [...uploadedAccountFiles, ...textUrlList];
-
-            if (finalImages.length === 0) {
-                alert('กรุณาเลือกอัปโหลดรูปภาพไอดีจากโทรศัพท์ หรือวางลิงก์รูปภาพอย่างน้อย 1 รูป');
-                return;
-            }
-
-            const accData = {
-                id: editId || ('MLBB-' + Math.floor(5900 + Math.random() * 1000)),
-                game: 'MLBB',
-                tag: document.getElementById('form-acc-tag').value,
-                rank: document.getElementById('form-acc-rank').value,
-                title: document.getElementById('form-acc-title').value,
-                price: Number(document.getElementById('form-acc-price').value),
-                oldPrice: document.getElementById('form-acc-oldprice').value ? Number(document.getElementById('form-acc-oldprice').value) : null,
-                skins: document.getElementById('form-acc-skins').value,
-                heroes: document.getElementById('form-acc-heroes').value,
-                images: finalImages,
-                desc: document.getElementById('form-acc-desc').value,
-                loginId: document.getElementById('form-acc-login-id').value,
-                loginPass: document.getElementById('form-acc-login-pass').value,
-                status: document.getElementById('form-acc-status').value,
-                createdAt: new Date().toISOString()
-            };
-
-            if (editId) {
-                const index = accounts.findIndex(a => a.id === editId);
-                if (index !== -1) accounts[index] = accData;
-                showToast('อัปเดตข้อมูลไอดีเรียบร้อยแล้ว');
-            } else {
-                accounts.unshift(accData);
-                showToast('ลงขายไอดี MLBB ใหม่เรียบร้อยแล้ว');
-            }
-
-            saveAccounts();
-            refreshAllViews();
-            closeModal('modal-account');
-        }
-
-        function openQuickPriceModal(accId) {
-            const acc = accounts.find(a => a.id === accId);
-            if (!acc) return;
-
-            document.getElementById('qp-acc-id').value = acc.id;
-            document.getElementById('qp-acc-title').textContent = acc.title;
-            document.getElementById('qp-acc-price').value = acc.price;
-
-            document.getElementById('modal-quick-price').classList.remove('hidden');
-        }
-
-        function handleQuickPriceSubmit(e) {
-            e.preventDefault();
-            const accId = document.getElementById('qp-acc-id').value;
-            const newPrice = Number(document.getElementById('qp-acc-price').value);
-
-            const acc = accounts.find(a => a.id === accId);
-            if (acc) {
-                acc.price = newPrice;
-                saveAccounts();
-                refreshAllViews();
-                closeModal('modal-quick-price');
-                showToast(`ปรับราคาไอดี ${accId} เป็น ฿${newPrice.toLocaleString()} เรียบร้อยแล้ว`);
-            }
-        }
-
-        function deleteAccount(accId) {
-            if (confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบไอดี ${accId}?`)) {
-                accounts = accounts.filter(a => a.id !== accId);
-                saveAccounts();
-                refreshAllViews();
-                showToast('ลบรายการไอดีแล้ว');
-            }
-        }
-
-        function updateOrderStatus(orderId, newStatus) {
-            const ord = orders.find(o => o.orderId === orderId);
-            if (ord) {
-                ord.status = newStatus;
-
-                if (newStatus === 'APPROVED') {
-                    const acc = accounts.find(a => a.id === ord.accId);
-                    if (acc) {
-                        acc.status = 'SOLD';
-                        saveAccounts();
-                    }
-                }
-
-                saveOrders();
-                refreshAllViews();
-                showToast(`อัปเดตสถานะคำสั่งซื้อ ${orderId} เป็น ${newStatus} แล้ว`);
-            }
-        }
-
-        function previewSlip(url) {
-            const img = document.getElementById('slip-preview-img');
-            img.src = url || 'https://placehold.co/400x600/1e293b/a855f7?text=No+Slip';
-            document.getElementById('modal-slip-preview').classList.remove('hidden');
-        }
-
-        // UTILS & TOAST
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
-        }
-
-        function copyToClipboard(text) {
-            const el = document.createElement('textarea');
-            el.value = text;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            const msgEl = document.getElementById('toast-msg');
-            msgEl.textContent = msg;
-
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
-        }
-    </script>
-</body>
-</html>
+        let bankSettings = { bankName: 'กสิกรไทย', accountNo: '123-4-56789-0', accountName: 'ร้าน MLBB', promptpayNo: '0895959595', qrImageUrl: '' };
+        let adminAuth = { username: 'admin', password: 'ml
