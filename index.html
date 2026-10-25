@@ -160,7 +160,7 @@
                         ซื้อไอดีเกม <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-purple-300 to-pink-400">MLBB เครื่องแต่ง</span> สกินสะสมแรร์
                     </h1>
                     <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
-                        แหล่งรวมไอดี Mobile Legends: Bang Bang สกิน Collector, Legend, Prime, Sanrio, Aspirants และ KOF ตรวจสอบรูปภาพหลายมุมมองแบบจุใจ ปรับราคาเรียลไทม์ โอนไวด้วย PromptPay รับรหัสผ่านเข้าเล่นทันที!
+                        แหล่งรวมไอดี Mobile Legends: Bang Bang สกิน Collector, Legend, Prime, Sanrio, Aspirants และ KOF ตรวจสอบรูปภาพหลายมุมมองแบบจุใจ ปรับราคาเรียลไทม์ โอนไวด้วย PromptPay หรือ บัญชีธนาคาร รับรหัสผ่านเข้าเล่นทันที!
                     </p>
                     <div class="flex flex-wrap gap-4 pt-2">
                         <button onclick="navigateTo('catalog')" class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-purple-600 to-pink-600 text-white font-bold hover:brightness-110 shadow-lg shadow-purple-600/30 transition-all flex items-center gap-2">
@@ -569,7 +569,7 @@
     </div>
 
 
-    <!-- 3. BUY / CHECKOUT MODAL -->
+    <!-- 3. BUY / CHECKOUT MODAL (WITH BANK & PROMPTPAY TABS) -->
     <div id="modal-checkout" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-5 relative my-8 shadow-2xl">
             <button onclick="closeModal('modal-checkout')" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2">
@@ -578,7 +578,7 @@
 
             <div class="border-b border-slate-800 pb-3">
                 <span class="text-xs text-amber-400 font-bold tracking-wide">CHECKOUT • MLBB เครื่องแต่ง</span>
-                <h3 class="text-xl font-black text-white">ชำระเงิน PromptPay QR</h3>
+                <h3 class="text-xl font-black text-white">ช่องทางการชำระเงิน</h3>
             </div>
 
             <!-- Item Summary -->
@@ -586,11 +586,54 @@
                 <!-- Dynamic Summary -->
             </div>
 
+            <!-- PAYMENT TABS -->
+            <div class="flex border-b border-slate-800">
+                <button type="button" onclick="switchPayTab('bank')" id="pay-tab-bank" class="w-1/2 pb-2 text-sm font-bold border-b-2 border-emerald-400 text-emerald-400 text-center">
+                    <i class="fa-solid fa-building-columns mr-1"></i> โอนผ่านบัญชีธนาคาร
+                </button>
+                <button type="button" onclick="switchPayTab('promptpay')" id="pay-tab-promptpay" class="w-1/2 pb-2 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 text-center">
+                    <i class="fa-solid fa-qrcode mr-1"></i> PromptPay QR
+                </button>
+            </div>
+
             <form onsubmit="handleCheckoutSubmit(event)" class="space-y-4">
                 <input type="hidden" id="checkout-acc-id">
 
-                <!-- PromptPay Box -->
-                <div class="bg-slate-950 border border-cyan-500/30 rounded-2xl p-4 text-center space-y-3">
+                <!-- 1. BANK ACCOUNT PANEL -->
+                <div id="pay-panel-bank" class="bg-slate-950 border border-emerald-500/30 rounded-2xl p-4 space-y-3">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold">
+                        <i class="fa-solid fa-building-columns"></i> บัญชีธนาคารรับโอนเงิน
+                    </div>
+
+                    <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                            <span class="text-slate-400">ธนาคาร:</span>
+                            <span class="text-white font-bold flex items-center gap-1">
+                                <i class="fa-solid fa-money-check-dollar text-emerald-400"></i> ธนาคารกสิกรไทย (K-Bank)
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                            <span class="text-slate-400">เลขที่บัญชี:</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-amber-400 font-mono font-bold text-base">123-4-56789-0</span>
+                                <button type="button" onclick="copyTextToClipboard('1234567890', 'คัดลอกเลขบัญชีแล้ว!')" class="text-xs bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/40">
+                                    <i class="fa-solid fa-copy"></i> คัดลอก
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-400">ชื่อบัญชี:</span>
+                            <span class="text-white font-semibold">ร้าน MLBB เครื่องแต่ง Official</span>
+                        </div>
+                    </div>
+
+                    <div class="text-center text-emerald-400 font-black text-base pt-1">
+                        ยอดที่ต้องโอน: <span class="checkout-price-display">0</span> บาท
+                    </div>
+                </div>
+
+                <!-- 2. PROMPTPAY PANEL -->
+                <div id="pay-panel-promptpay" class="hidden bg-slate-950 border border-cyan-500/30 rounded-2xl p-4 text-center space-y-3">
                     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-xs font-bold">
                         <i class="fa-solid fa-qrcode"></i> สแกนชำระเงิน PromptPay QR Code
                     </div>
@@ -601,10 +644,10 @@
 
                     <div class="text-xs text-slate-300 space-y-1">
                         <p>หมายเลขพร้อมเพย์: <strong class="text-white font-mono text-sm">089-595-9595</strong> 
-                            <button type="button" onclick="copyPromptPayNumber()" class="text-amber-400 underline hover:text-amber-300 ml-1">คัดลอก</button>
+                            <button type="button" onclick="copyTextToClipboard('0895959595', 'คัดลอกเบอร์พร้อมเพย์แล้ว!')" class="text-amber-400 underline hover:text-amber-300 ml-1">คัดลอก</button>
                         </p>
                         <p>ชื่อบัญชี: <strong class="text-white">ร้าน MLBB เครื่องแต่ง (Official)</strong></p>
-                        <p class="text-emerald-400 font-black text-base">ยอดที่ต้องโอน: <span id="checkout-price-display">0</span> บาท</p>
+                        <p class="text-emerald-400 font-black text-base">ยอดที่ต้องโอน: <span class="checkout-price-display">0</span> บาท</p>
                     </div>
                 </div>
 
@@ -1127,8 +1170,10 @@
             if (!acc) return;
 
             document.getElementById('checkout-acc-id').value = acc.id;
-            document.getElementById('checkout-price-display').textContent = Number(acc.price).toLocaleString();
             
+            const priceDisplays = document.querySelectorAll('.checkout-price-display');
+            priceDisplays.forEach(el => el.textContent = Number(acc.price).toLocaleString());
+
             // Dynamic PromptPay QR image generation
             const qrImg = document.getElementById('checkout-qr-img');
             qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=MLBB-OUTFIT-PROMPTPAY-0895959595-AMOUNT-${acc.price}`;
@@ -1143,17 +1188,37 @@
                 </div>
             `;
 
+            switchPayTab('bank'); // Default to Bank tab
             document.getElementById('modal-checkout').classList.remove('hidden');
         }
 
-        function copyPromptPayNumber() {
+        function switchPayTab(tab) {
+            const bankPanel = document.getElementById('pay-panel-bank');
+            const promptpayPanel = document.getElementById('pay-panel-promptpay');
+            const bankBtn = document.getElementById('pay-tab-bank');
+            const promptpayBtn = document.getElementById('pay-tab-promptpay');
+
+            if (tab === 'bank') {
+                bankPanel.classList.remove('hidden');
+                promptpayPanel.classList.add('hidden');
+                bankBtn.className = "w-1/2 pb-2 text-sm font-bold border-b-2 border-emerald-400 text-emerald-400 text-center";
+                promptpayBtn.className = "w-1/2 pb-2 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 text-center";
+            } else {
+                bankPanel.classList.add('hidden');
+                promptpayPanel.classList.remove('hidden');
+                promptpayBtn.className = "w-1/2 pb-2 text-sm font-bold border-b-2 border-cyan-400 text-cyan-400 text-center";
+                bankBtn.className = "w-1/2 pb-2 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 text-center";
+            }
+        }
+
+        function copyTextToClipboard(text, successMsg) {
             const el = document.createElement('textarea');
-            el.value = '0895959595';
+            el.value = text;
             document.body.appendChild(el);
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
-            showToast('คัดลอกหมายเลขพร้อมเพย์แล้ว!');
+            showToast(successMsg);
         }
 
         function handleCheckoutSubmit(e) {
